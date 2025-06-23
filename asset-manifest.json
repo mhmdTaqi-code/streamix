@@ -1,13 +1,15 @@
 {
   "files": {
     "main.css": "/streamix/static/css/main.7fce88ef.css",
-    "main.js": "/streamix/static/js/main.ba1524be.js",
+    "main.js": "/streamix/static/js/main.b9850a4f.js",
+    "static/media/streamix-logo.png": "/streamix/static/media/streamix-logo.51e52ec26a45db8d672a.png",
+    "static/media/1.png": "/streamix/static/media/1.83079efc5794450d6c13.png",
     "index.html": "/streamix/index.html",
     "main.7fce88ef.css.map": "/streamix/static/css/main.7fce88ef.css.map",
-    "main.ba1524be.js.map": "/streamix/static/js/main.ba1524be.js.map"
+    "main.b9850a4f.js.map": "/streamix/static/js/main.b9850a4f.js.map"
   },
   "entrypoints": [
     "static/css/main.7fce88ef.css",
-    "static/js/main.ba1524be.js"
+    "static/js/main.b9850a4f.js"
   ]
 }
