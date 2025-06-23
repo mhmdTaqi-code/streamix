@@ -7,16 +7,27 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Avatar
+  Avatar,
+  IconButton,
+  Badge,
 } from "@mui/material";
-import { Home, Whatshot, Subscriptions, VideoLibrary, Settings, Chat } from "@mui/icons-material";
+import {
+  Home,
+  Whatshot,
+  Subscriptions,
+  VideoLibrary,
+  Settings,
+  Chat,
+  Notifications,
+  AccountCircle,
+} from "@mui/icons-material";
 
 const menuItems = [
   { icon: <Home />, text: "New Feed" },
   { icon: <Whatshot />, text: "Trending" },
   { icon: <Subscriptions />, text: "Following" },
   { icon: <VideoLibrary />, text: "Your Videos" },
-  { icon: <VideoLibrary />, text: "Playlist" }
+  { icon: <VideoLibrary />, text: "Playlist" },
 ];
 
 const following = [
@@ -26,16 +37,45 @@ const following = [
   "Isaac Lambert",
   "Lillie Nash",
   "Edith Cain",
-  "Jerry Sherman"
+  "Jerry Sherman",
 ];
 
 export default function Sidebar() {
   return (
-    <Box sx={{ width: 240, bgcolor: "#161616", color: "white", height: "100%", p: 2 }}>
+    <Box
+      sx={{
+        width: 240,
+        bgcolor: "#161616",
+        color: "white",
+        height: "100%",
+        p: 2,
+      }}
+    >
       <Typography variant="h6" gutterBottom>
         the Mind
       </Typography>
 
+      {/* Icons Centered */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 2,
+          mb: 2,
+        }}
+      >
+        <IconButton sx={{ color: "white" }}>
+          <Badge badgeContent={2} color="error">
+            <Notifications />
+          </Badge>
+        </IconButton>
+        <IconButton sx={{ color: "white" }}>
+          <AccountCircle />
+        </IconButton>
+      </Box>
+
+      {/* Menu List */}
       <List>
         {menuItems.map((item, index) => (
           <ListItem button key={index} sx={{ borderRadius: 2 }}>
@@ -57,7 +97,9 @@ export default function Sidebar() {
             <ListItemIcon>
               <Avatar sx={{ width: 24, height: 24 }} />
             </ListItemIcon>
-            <ListItemText primary={<Typography sx={{ fontSize: 14 }}>{name}</Typography>} />
+            <ListItemText
+              primary={<Typography sx={{ fontSize: 14 }}>{name}</Typography>}
+            />
           </ListItem>
         ))}
       </List>
@@ -66,11 +108,15 @@ export default function Sidebar() {
 
       <List>
         <ListItem button>
-          <ListItemIcon sx={{ color: "white" }}><Chat /></ListItemIcon>
+          <ListItemIcon sx={{ color: "white" }}>
+            <Chat />
+          </ListItemIcon>
           <ListItemText primary="Chat" />
         </ListItem>
         <ListItem button>
-          <ListItemIcon sx={{ color: "white" }}><Settings /></ListItemIcon>
+          <ListItemIcon sx={{ color: "white" }}>
+            <Settings />
+          </ListItemIcon>
           <ListItemText primary="Settings" />
         </ListItem>
       </List>

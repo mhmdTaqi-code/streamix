@@ -60,18 +60,7 @@ export default function Header({ searchOnly }) {
       </Box>
 
       {/* Icons (hidden on small screens) */}
-      {!searchOnly && (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <IconButton sx={{ color: "white" }}>
-            <Badge badgeContent={2} color="error">
-              <Notifications />
-            </Badge>
-          </IconButton>
-          <IconButton sx={{ color: "white" }}>
-            <AccountCircle />
-          </IconButton>
-        </Box>
-      )}
+   
     </Box>
   );
 }

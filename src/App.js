@@ -1,4 +1,3 @@
-// 1. App.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -8,6 +7,8 @@ import {
   useMediaQuery,
   AppBar,
   Toolbar,
+  Container,
+  Grid,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./components/Sidebar";
@@ -34,7 +35,7 @@ export default function App() {
       <CssBaseline />
 
       {/* Sidebar Desktop */}
-      {!isMobile && <Sidebar />}
+      {!isMobile && <Sidebar includeProfileAndNotifications={true} />}
 
       {/* Sidebar Mobile Drawer */}
       {isMobile && (
@@ -45,6 +46,7 @@ export default function App() {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: "block",
+            zIndex: 1401, // Make sure it's above the AppBar
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: 240,
@@ -54,10 +56,11 @@ export default function App() {
               position: "fixed",
               top: 0,
               left: 0,
+              zIndex: 1401,
             },
           }}
         >
-          <Sidebar />
+          <Sidebar includeProfileAndNotifications={true} />
         </Drawer>
       )}
 
@@ -68,13 +71,12 @@ export default function App() {
           width: "100%",
           height: "100vh",
           overflowY: "auto",
-          px: { xs: 1, sm: 2, md: 3 },
         }}
       >
         {/* Navbar */}
         <AppBar
           position="sticky"
-          sx={{ bgcolor: "#0f0f0f", boxShadow: "none", height: "56px" }}
+          sx={{ bgcolor: "#0f0f0f", boxShadow: "none", height: "56px", zIndex: 1100 }}
         >
           <Toolbar
             sx={{
@@ -102,24 +104,19 @@ export default function App() {
 
         <HeroSection />
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Box sx={{ width: "100%", maxWidth: 600 }}>
-            <LiveChannels />
-          </Box>
-          <Box sx={{ width: "100%", maxWidth: 600 }}>
-            <Categories />
-          </Box>
-          <Box sx={{ width: "100%", maxWidth: 600 }}>
-            <RecommendedVideos />
-          </Box>
-        </Box>
+        <Container maxWidth="xl" sx={{ py: 2 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <LiveChannels />
+            </Grid>
+            <Grid item xs={12}>
+              <Categories />
+            </Grid>
+            <Grid item xs={12}>
+              <RecommendedVideos />
+            </Grid>
+          </Grid>
+        </Container>
       </Box>
     </Box>
   );
