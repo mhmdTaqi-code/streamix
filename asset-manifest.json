@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/streamix/static/css/main.7fce88ef.css",
+    "main.js": "/streamix/static/js/main.0bcf23c3.js",
+    "index.html": "/streamix/index.html",
+    "main.7fce88ef.css.map": "/streamix/static/css/main.7fce88ef.css.map",
+    "main.0bcf23c3.js.map": "/streamix/static/js/main.0bcf23c3.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7fce88ef.css",
+    "static/js/main.0bcf23c3.js"
+  ]
+}
