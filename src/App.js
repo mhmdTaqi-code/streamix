@@ -26,7 +26,7 @@ export default function App() {
     <Box
       sx={{
         display: "flex",
-        bgcolor: "#0f0f0f",
+        bgcolor: "#f5f5f5",
         flexDirection: isMobile ? "column" : "row",
         height: "100vh",
         overflow: "hidden",
@@ -46,12 +46,12 @@ export default function App() {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: "block",
-            zIndex: 1401, // Make sure it's above the AppBar
+            zIndex: 1401,
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: 240,
-              bgcolor: "#161616",
-              color: "white",
+              bgcolor: "#f9f9f9",
+              color: "#000",
               height: "100vh",
               position: "fixed",
               top: 0,
@@ -71,12 +71,18 @@ export default function App() {
           width: "100%",
           height: "100vh",
           overflowY: "auto",
+          bgcolor: "#f5f5f5",
         }}
       >
         {/* Navbar */}
         <AppBar
-          position="sticky"
-          sx={{ bgcolor: "#0f0f0f", boxShadow: "none", height: "56px", zIndex: 1100 }}
+          position="fixed"
+          sx={{
+            bgcolor: "#ffffff",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+            height: "56px",
+            zIndex: 1200,
+          }}
         >
           <Toolbar
             sx={{
@@ -89,12 +95,11 @@ export default function App() {
           >
             <IconButton
               edge="start"
-              color="inherit"
               aria-label="menu"
               onClick={() => setMobileOpen(!mobileOpen)}
-              sx={{ p: 0, display: { xs: "inline-flex", md: "none" } }}
+              sx={{ p: 0, ml: 1, display: { xs: "inline-flex", md: "none" } }} // ← هنا التعديل
             >
-              <MenuIcon sx={{ color: "white", fontSize: 24 }} />
+              <MenuIcon sx={{ color: "#000", fontSize: 24 }} />
             </IconButton>
             <Box sx={{ flexGrow: 1, px: 1 }}>
               <Header searchOnly={isMobile} />
@@ -102,21 +107,24 @@ export default function App() {
           </Toolbar>
         </AppBar>
 
-        <HeroSection />
+        {/* Main content */}
+        <Box sx={{ mt: "56px" }}>
+          <HeroSection />
 
-        <Container maxWidth="xl" sx={{ py: 2 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <LiveChannels />
+          <Container maxWidth="xl" sx={{ py: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <LiveChannels />
+              </Grid>
+              <Grid item xs={12}>
+                <Categories />
+              </Grid>
+              <Grid item xs={12}>
+                <RecommendedVideos />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Categories />
-            </Grid>
-            <Grid item xs={12}>
-              <RecommendedVideos />
-            </Grid>
-          </Grid>
-        </Container>
+          </Container>
+        </Box>
       </Box>
     </Box>
   );

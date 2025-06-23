@@ -45,13 +45,14 @@ export default function Sidebar() {
     <Box
       sx={{
         width: 240,
-        bgcolor: "#161616",
-        color: "white",
+        bgcolor: "#f9f9f9", // أفتح درجة بعد f5f5f5
+        color: "#000",
         height: "100%",
         p: 2,
+        borderRight: "1px solid #e0e0e0",
       }}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
         the Mind
       </Typography>
 
@@ -65,12 +66,12 @@ export default function Sidebar() {
           mb: 2,
         }}
       >
-        <IconButton sx={{ color: "white" }}>
+        <IconButton sx={{ color: "#000" }}>
           <Badge badgeContent={2} color="error">
             <Notifications />
           </Badge>
         </IconButton>
-        <IconButton sx={{ color: "white" }}>
+        <IconButton sx={{ color: "#000" }}>
           <AccountCircle />
         </IconButton>
       </Box>
@@ -79,15 +80,15 @@ export default function Sidebar() {
       <List>
         {menuItems.map((item, index) => (
           <ListItem button key={index} sx={{ borderRadius: 2 }}>
-            <ListItemIcon sx={{ color: "white" }}>{item.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: "#000" }}>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
       </List>
 
-      <Divider sx={{ my: 2, bgcolor: "#333" }} />
+      <Divider sx={{ my: 2, bgcolor: "#e0e0e0" }} />
 
-      <Typography variant="subtitle2" sx={{ color: "gray", mb: 1 }}>
+      <Typography variant="subtitle2" sx={{ color: "#666", mb: 1 }}>
         Following
       </Typography>
 
@@ -104,17 +105,17 @@ export default function Sidebar() {
         ))}
       </List>
 
-      <Divider sx={{ my: 2, bgcolor: "#333" }} />
+      <Divider sx={{ my: 2, bgcolor: "#e0e0e0" }} />
 
       <List>
         <ListItem button>
-          <ListItemIcon sx={{ color: "white" }}>
+          <ListItemIcon sx={{ color: "#000" }}>
             <Chat />
           </ListItemIcon>
           <ListItemText primary="Chat" />
         </ListItem>
         <ListItem button>
-          <ListItemIcon sx={{ color: "white" }}>
+          <ListItemIcon sx={{ color: "#000" }}>
             <Settings />
           </ListItemIcon>
           <ListItemText primary="Settings" />
