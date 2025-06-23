@@ -45,27 +45,37 @@ export default function Sidebar() {
     <Box
       sx={{
         width: 240,
-        bgcolor: "#f9f9f9", // أفتح درجة بعد f5f5f5
+        bgcolor: "#f9f9f9",
         color: "#000",
-        height: "100%",
+        height: "100vh",
         p: 2,
         borderRight: "1px solid #e0e0e0",
+        position: "sticky",
+        top: 0,
+        overflowY: "auto",
+        direction: "rtl", // عكس الاتجاه
+        "& *": {
+          direction: "ltr", // يرجع النصوص للطبيعي
+        },
+        // Scrollbar customization
+        "&::-webkit-scrollbar": {
+          width: "8px",
+        },
+        "&::-webkit-scrollbar-track": {
+          background: "#f0f0f0",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "#c1c1c1",
+          borderRadius: "4px",
+        },
       }}
     >
       <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
         the Mind
       </Typography>
 
-      {/* Icons Centered */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 2,
-          mb: 2,
-        }}
-      >
+      {/* Icons Top */}
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 2 }}>
         <IconButton sx={{ color: "#000" }}>
           <Badge badgeContent={2} color="error">
             <Notifications />
@@ -76,7 +86,7 @@ export default function Sidebar() {
         </IconButton>
       </Box>
 
-      {/* Menu List */}
+      {/* Main Navigation */}
       <List>
         {menuItems.map((item, index) => (
           <ListItem button key={index} sx={{ borderRadius: 2 }}>
