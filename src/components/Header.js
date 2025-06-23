@@ -33,7 +33,7 @@ export default function Header({ searchOnly }) {
       )}
 
       {/* Search Bar */}
-      <Box sx={{ position: "relative", flex: 1 , width:"70%", }}>
+      <Box sx={{ position: "relative", flex: 1 , }}>
         <Search
           sx={{ 
             position: "absolute",
