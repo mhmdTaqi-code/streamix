@@ -11,12 +11,12 @@ import {
   Grid,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import Sidebar from "../components/Homepage/Sidebar";
-import Header from "../components/Homepage/Header";
-import HeroSection from "../components/Homepage/HeroSection";
-import LiveChannels from "../components/Homepage/LiveChannels";
-import Categories from "../components/Homepage/Categories";
-import RecommendedVideos from "../components/Homepage/RecommendedVideos";
+import Sidebar from "../components/Home/Sidebar";
+import Header from "../components/Home/Header";
+import HeroSection from "../components/Home/HeroSection";
+import LiveChannels from "../components/Home/LiveChannels";
+import Categories from "../components/Home/Categories";
+import RecommendedVideos from "../components/Home/RecommendedVideos";
 
 export default function Homepage() {
   const [mobileOpen, setMobileOpen] = useState(false);

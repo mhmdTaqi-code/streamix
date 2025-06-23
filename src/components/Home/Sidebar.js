@@ -21,6 +21,7 @@ import {
   Notifications,
   AccountCircle,
 } from "@mui/icons-material";
+import logo from "../../assets/1.png"
 
 const menuItems = [
   { icon: <Home />, text: "New Feed" },
@@ -70,8 +71,8 @@ export default function Sidebar() {
         },
       }}
     >
-      <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-        the Mind
+      <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold",direction:"rtl", alignItems:"center", display:"flex", flexDirection:"row", justifyContent:"space-around"} }>
+        STREAMIX <img style={{width:"50px"} } src={logo}></img>
       </Typography>
 
       {/* Icons Top */}
