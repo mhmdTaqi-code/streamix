@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/streamix/static/css/main.7fce88ef.css",
-    "main.js": "/streamix/static/js/main.d9e67bcb.js",
+    "main.js": "/streamix/static/js/main.ba1524be.js",
     "index.html": "/streamix/index.html",
     "main.7fce88ef.css.map": "/streamix/static/css/main.7fce88ef.css.map",
-    "main.d9e67bcb.js.map": "/streamix/static/js/main.d9e67bcb.js.map"
+    "main.ba1524be.js.map": "/streamix/static/js/main.ba1524be.js.map"
   },
   "entrypoints": [
     "static/css/main.7fce88ef.css",
-    "static/js/main.d9e67bcb.js"
+    "static/js/main.ba1524be.js"
   ]
 }
