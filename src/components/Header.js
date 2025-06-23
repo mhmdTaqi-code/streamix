@@ -1,31 +1,67 @@
+// Header.jsx
 import React from "react";
-import { AppBar, Toolbar, Typography, InputBase, IconButton, Box, Badge, Avatar } from "@mui/material";
-import { Search, Notifications, AccountCircle } from "@mui/icons-material";
+import {
+  Box,
+  Typography,
+  InputBase,
+  IconButton,
+  Badge,
+} from "@mui/material";
+import {
+  Search,
+  Notifications,
+  AccountCircle,
+} from "@mui/icons-material";
 
-export default function Header() {
+export default function Header({ searchOnly }) {
   return (
-    <AppBar position="static" sx={{ bgcolor: "#1c1c1c", px: 2 }}>
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Typography variant="h6" sx={{ color: "white" }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
+        gap: 1,
+      }}
+    >
+      {/* Browse Title (hidden on small screens) */}
+      {!searchOnly && (
+        <Typography
+          variant="h6"
+          sx={{ color: "white", display: { xs: "none", sm: "block" } }}
+        >
           Browse
         </Typography>
+      )}
 
-        <Box sx={{ position: "relative", flex: 1, mx: 4 }}>
-          <Search sx={{ position: "absolute", top: "50%", left: 8, transform: "translateY(-50%)", color: "gray" }} />
-          <InputBase
-            placeholder="Search Everything"
-            sx={{
-              width: "100%",
-              bgcolor: "#2c2c2c",
-              color: "white",
-              px: 4,
-              py: 1,
-              borderRadius: 2,
-            }}
-          />
-        </Box>
+      {/* Search Bar */}
+      <Box sx={{ position: "relative", flex: 1 }}>
+        <Search
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: 8,
+            transform: "translateY(-50%)",
+            color: "gray",
+            fontSize: 20,
+          }}
+        />
+        <InputBase
+          placeholder="Search Everything"
+          sx={{
+            width: "100%",
+            bgcolor: "#2c2c2c",
+            color: "white",
+            pl: 4,
+            py: 0.8,
+            borderRadius: 2,
+            fontSize: 14,
+          }}
+        />
+      </Box>
 
-        <Box>
+      {/* Icons (hidden on small screens) */}
+      {!searchOnly && (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <IconButton sx={{ color: "white" }}>
             <Badge badgeContent={2} color="error">
               <Notifications />
@@ -35,7 +71,7 @@ export default function Header() {
             <AccountCircle />
           </IconButton>
         </Box>
-      </Toolbar>
-    </AppBar>
+      )}
+    </Box>
   );
 }

@@ -1,3 +1,4 @@
+// 1. App.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -5,6 +6,8 @@ import {
   IconButton,
   Drawer,
   useMediaQuery,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./components/Sidebar";
@@ -68,42 +71,54 @@ export default function App() {
           px: { xs: 1, sm: 2, md: 3 },
         }}
       >
-        {/* Mobile Drawer Icon مع Header */}
-        {isMobile && (
-          <Box
+        {/* Navbar */}
+        <AppBar
+          position="sticky"
+          sx={{ bgcolor: "#0f0f0f", boxShadow: "none", height: "56px" }}
+        >
+          <Toolbar
             sx={{
+              minHeight: "56px !important",
+              px: 1,
               display: "flex",
               alignItems: "center",
-              bgcolor: "#0f0f0f",
-              px: 1,
-              py: 1,
-              zIndex: 1500,
-              position: "sticky",
-              top: 0,
-              height: "60px",
+              justifyContent: "space-between",
             }}
           >
             <IconButton
               edge="start"
               color="inherit"
-              aria-label="open drawer"
+              aria-label="menu"
               onClick={() => setMobileOpen(!mobileOpen)}
+              sx={{ p: 0, display: { xs: "inline-flex", md: "none" } }}
             >
-              <MenuIcon sx={{ color: "white", fontSize: 28 }} />
+              <MenuIcon sx={{ color: "white", fontSize: 24 }} />
             </IconButton>
-            <Box sx={{ flexGrow: 1 }}>
-              <Header />
+            <Box sx={{ flexGrow: 1, px: 1 }}>
+              <Header searchOnly={isMobile} />
             </Box>
-          </Box>
-        )}
-
-        {!isMobile && <Header />}
+          </Toolbar>
+        </AppBar>
 
         <HeroSection />
-        <Box sx={{ px: { xs: 0, sm: 1, md: 2 } }}>
-          <LiveChannels />
-          <Categories />
-          <RecommendedVideos />
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Box sx={{ width: "100%", maxWidth: 600 }}>
+            <LiveChannels />
+          </Box>
+          <Box sx={{ width: "100%", maxWidth: 600 }}>
+            <Categories />
+          </Box>
+          <Box sx={{ width: "100%", maxWidth: 600 }}>
+            <RecommendedVideos />
+          </Box>
         </Box>
       </Box>
     </Box>
