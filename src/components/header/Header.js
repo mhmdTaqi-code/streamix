@@ -17,17 +17,28 @@ export default function Header({ searchOnly }) {
   return (
     <Box
       sx={{
+        justifyContent:"space-between",
         display: "flex",
         alignItems: "center",
         width: "100%",
+        backgroundColor:"black",
         gap: 1,
+        margin:"auto",
+        left:"31%",
+        height:"50px",
+           '@media (max-width:600px)': {
+         width: "100%",
+         position:"absolute",
+        },
+        
+
       }}
     >
       {/* Browse Title (hidden on small screens) */}
       {!searchOnly && (
         <Typography
           variant="h6"
-          sx={{ color: "white", display: { xs: "none", sm: "block" } }}
+          sx={{ color: "white", display: { xs: "none", sm: "block" },position:"absolute",left:"21%", }}
         >
           Browse
         </Typography>
@@ -35,24 +46,19 @@ export default function Header({ searchOnly }) {
 
       {/* Search Bar */}
       <Box sx={{ position: "relative", flex: 1 }}>
-        <Search
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: 8,
-            transform: "translateY(-50%)",
-            color: "gray",
-            fontSize: 20,
-          }}
-        />
+      
         <InputBase
           placeholder="Search Everything"
           sx={{
-            width: "100%",
+            left:"28%",
+            marginTop:"3px",
             bgcolor: "#2c2c2c",
             color: "white",
             pl: 4,
-            py: 0.8,
+            width:"50%",
+            px:2,
+            marginLeft:"2px",
+            py: 0.3,
             borderRadius: 2,
             fontSize: 14,
           }}
@@ -61,7 +67,7 @@ export default function Header({ searchOnly }) {
 
       {/* Icons (hidden on small screens) */}
       {!searchOnly && (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1}}>
           <IconButton sx={{ color: "white" }}>
             <Badge badgeContent={2} color="error">
               <Notifications />
