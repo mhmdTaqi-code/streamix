@@ -1,16 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Typography, Grid, Card, CardMedia, CardContent } from "@mui/material";
 import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
-
-const categories = [
-  { title: "FPS", image: "https://i.imgur.com/BbZV3Aa.jpg" },
-  { title: "MOBA", image: "https://i.imgur.com/LuK50Pj.jpg" },
-  { title: "RPG", image: "https://i.imgur.com/2A2X3p5.jpg" },
-  { title: "Strategy", image: "https://i.imgur.com/0A0JhKb.jpg" },
-];
+import { useDispatch, useSelector } from "react-redux";
+import GETALLCAT from './../../redux/action/CatgAction';
+import { axios } from 'axios';
+import Baseurl from './../../Api/BaceUrl';
 
 export default function Categories() {
+
+
+const a = async () => {
+  const res = await Baseurl.get("/live/api/streams/?categories=1");
+  console.log(res.data); // اطبع البيانات هنا
+};
+
+
+
+
+const { catg: categories, isLoading } = useSelector(state => state.catg);
+const dispatch = useDispatch()
+
+useEffect(()=>{
+dispatch(GETALLCAT())
+a(); 
+},[])
+
+useEffect(() => {
+  console.log("Updated categories: ", categories);
+}, [categories]);
+
+
+
+
+
   return (
     <Box sx={{ px: 2, mb: 4 }}>
       <Typography variant="h6" sx={{ color: "#000", mb: 2 }}>Categories</Typography>
