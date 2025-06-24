@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,7 +9,7 @@ import {
   Divider,
   Avatar,
   IconButton,
-  Badge,
+  Button,
 } from "@mui/material";
 import {
   Home,
@@ -20,8 +20,11 @@ import {
   Chat,
   Notifications,
   AccountCircle,
+  Logout,
+  Login,
 } from "@mui/icons-material";
-import logo from "../../assets/1.png"
+import logo from "../../assets/1.png";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   { icon: <Home />, text: "New Feed" },
@@ -42,6 +45,34 @@ const following = [
 ];
 
 export default function Sidebar() {
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    const isGuest = localStorage.getItem("isGuest");
+
+    if (storedUsername) {
+      setUsername(storedUsername);
+    } else if (isGuest === "true") {
+      setUsername("ضيف");
+    } else {
+      setUsername("ضيف");
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("username");
+    localStorage.removeItem("isGuest");
+    navigate("/");
+  };
+
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
   return (
     <Box
       sx={{
@@ -54,40 +85,63 @@ export default function Sidebar() {
         position: "sticky",
         top: 0,
         overflowY: "auto",
-        direction: "rtl", // عكس الاتجاه
-        "& *": {
-          direction: "ltr", // يرجع النصوص للطبيعي
-        },
-        // Scrollbar customization
-        "&::-webkit-scrollbar": {
-          width: "8px",
-        },
-        "&::-webkit-scrollbar-track": {
-          background: "#f0f0f0",
-        },
+        direction: "rtl",
+        "& *": { direction: "ltr" },
+        "&::-webkit-scrollbar": { width: "8px" },
+        "&::-webkit-scrollbar-track": { background: "#f0f0f0" },
         "&::-webkit-scrollbar-thumb": {
           backgroundColor: "#c1c1c1",
           borderRadius: "4px",
         },
       }}
     >
-      <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold",direction:"rtl", alignItems:"center", display:"flex", flexDirection:"row", justifyContent:"space-around"} }>
-        STREAMIX <img style={{width:"50px"} } src={logo}></img>
+      <Typography
+        variant="h6"
+        gutterBottom
+        sx={{
+          fontWeight: "bold",
+          direction: "rtl",
+          alignItems: "center",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-around",
+        }}
+      >
+        STREAMIX <img style={{ width: "50px" }} src={logo} alt="logo" />
       </Typography>
 
-      {/* Icons Top */}
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 2 }}>
-        <IconButton sx={{ color: "#000" }}>
-          <Badge badgeContent={2} color="error">
-            <Notifications />
-          </Badge>
-        </IconButton>
+      {/* اسم المستخدم وزر الدخول/الخروج */}
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", direction: "rtl", gap: 1, mb: 2 }}>
+        <Typography variant="body1" fontWeight="bold">{username}</Typography>
         <IconButton sx={{ color: "#000" }}>
           <AccountCircle />
         </IconButton>
       </Box>
 
-      {/* Main Navigation */}
+      {username === "ضيف" ? (
+        <Button
+          variant="outlined"
+          fullWidth
+          startIcon={<Login />}
+          onClick={handleLogin}
+          sx={{ mb: 2 }}
+        >
+          تسجيل الدخول
+        </Button>
+      ) : (
+        <Button
+          variant="outlined"
+          fullWidth
+          color="error"
+          startIcon={<Logout />}
+          onClick={handleLogout}
+          sx={{ mb: 2 }}
+        >
+          تسجيل الخروج
+        </Button>
+      )}
+
+      {/* القائمة الرئيسية */}
       <List>
         {menuItems.map((item, index) => (
           <ListItem button key={index} sx={{ borderRadius: 2 }}>

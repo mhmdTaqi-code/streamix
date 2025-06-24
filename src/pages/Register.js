@@ -1,10 +1,43 @@
 // File: src/pages/Register.jsx
 import React from "react";
-import { Box, Typography, TextField, Button, Grid, Paper, Link, Avatar } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
-import logo from "../assets/streamix-logo.png"; // تأكد من وجود صورة الشعار
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  Paper,
+  Link,
+  Avatar
+} from "@mui/material";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import logo from "../assets/streamix-logo.png";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import useRegisterHook from "../Hooks/Auth/register-hook";
+import FullScreenLoader from "../components/Loading";
 
 export default function Register() {
+  const {
+    name,
+    email,
+    password,
+    loading,
+    onChangeName,
+    onChangeEmail,
+    onChangePassword,
+    onSubmit,
+  } = useRegisterHook();
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async () => {
+    const success = await onSubmit();
+    if (success) {
+      navigate("/home"); // توجيه إلى صفحة home
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -12,7 +45,8 @@ export default function Register() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-       background: "linear-gradient(to right,rgb(255, 255, 255),rgb(248, 248, 248))",
+        background:
+          "linear-gradient(to right,rgb(255, 255, 255),rgb(248, 248, 248))",
         backgroundSize: "400% 400%",
         animation: "gradientAnimation 15s ease infinite",
       }}
@@ -26,7 +60,9 @@ export default function Register() {
           }
         `}
       </style>
-      <Paper elevation={3} sx={{ p: 4, maxWidth: 600, width: "100%", backdropFilter: "blur(6px)" }}>
+{loading ? <FullScreenLoader /> : null}
+      <Paper elevation={3} sx={{ p: 4, maxWidth: 600, width: "100%" }}>
+        <ToastContainer position="top-right" />
         <Box textAlign="center" mb={2}>
           <Avatar
             src={logo}
@@ -38,29 +74,49 @@ export default function Register() {
           </Typography>
         </Box>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField label="First Name" fullWidth variant="outlined" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField label="Last Name" fullWidth variant="outlined" />
+          <Grid item xs={12}>
+            <TextField
+              label="Full Name"
+              fullWidth
+              variant="outlined"
+              value={name}
+              onChange={onChangeName}
+            />
           </Grid>
           <Grid item xs={12}>
-            <TextField label="Email" fullWidth variant="outlined" />
+            <TextField
+              label="Email"
+              fullWidth
+              variant="outlined"
+              value={email}
+              onChange={onChangeEmail}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              variant="outlined"
+              value={password}
+              onChange={onChangePassword}
+            />
           </Grid>
           <Grid item xs={12}>
-            <TextField label="Password" type="password" fullWidth variant="outlined" />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField label="Confirm Password" type="password" fullWidth variant="outlined" />
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" color="primary" fullWidth>
-              Register
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Register"}
             </Button>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="body2" align="center">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link component={RouterLink} to="/login">
                 Login here
               </Link>

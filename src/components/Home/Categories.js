@@ -12,7 +12,7 @@ export default function Categories() {
 
 const a = async () => {
   const res = await Baseurl.get("/live/api/streams/?categories=1");
-  console.log(res.data); // اطبع البيانات هنا
+  console.log(res.data);    
 };
 
 
@@ -23,7 +23,7 @@ const dispatch = useDispatch()
 
 useEffect(()=>{
 dispatch(GETALLCAT())
-a(); 
+a()
 },[])
 
 useEffect(() => {

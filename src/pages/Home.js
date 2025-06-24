@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+// File: src/pages/Homepage.jsx
+
+import React, { useState, useEffect } from "react";
 import {
   Box,
   CssBaseline,
@@ -9,18 +11,30 @@ import {
   Toolbar,
   Container,
   Grid,
+  Fab,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import AddIcon from "@mui/icons-material/Add";
 import Sidebar from "../components/Home/Sidebar";
 import Header from "../components/Home/Header";
 import HeroSection from "../components/Home/HeroSection";
 import LiveChannels from "../components/Home/LiveChannels";
 import Categories from "../components/Home/Categories";
 import RecommendedVideos from "../components/Home/RecommendedVideos";
+import BroadcastModal from "../components/Home/BroadcastModal";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Homepage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:768px)");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  }, []);
 
   return (
     <Box
@@ -33,11 +47,10 @@ export default function Homepage() {
       }}
     >
       <CssBaseline />
+      <ToastContainer position="top-center" />
 
-      {/* Sidebar Desktop */}
       {!isMobile && <Sidebar includeProfileAndNotifications={true} />}
 
-      {/* Sidebar Mobile Drawer */}
       {isMobile && (
         <Drawer
           variant="temporary"
@@ -46,7 +59,7 @@ export default function Homepage() {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: "block",
-            zIndex: 1401, // Make sure it's above the AppBar
+            zIndex: 1401,
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: 240,
@@ -73,7 +86,6 @@ export default function Homepage() {
           overflowY: "auto",
         }}
       >
-        {/* Navbar */}
         <AppBar
           position="sticky"
           sx={{ bgcolor: "#f5f5f5", boxShadow: "none", height: "56px", zIndex: 1100 }}
@@ -82,7 +94,6 @@ export default function Homepage() {
             sx={{
               minHeight: "56px !important",
               px: 1,
-
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -95,7 +106,7 @@ export default function Homepage() {
               onClick={() => setMobileOpen(!mobileOpen)}
               sx={{ p: 0, display: { xs: "inline-flex", md: "none" } }}
             >
-              <MenuIcon sx={{ color: "black", fontSize: 24  , marginLeft:"20px"}} />
+              <MenuIcon sx={{ color: "black", fontSize: 24, marginLeft: "20px" }} />
             </IconButton>
             <Box sx={{ flexGrow: 1, px: 1 }}>
               <Header searchOnly={isMobile} />
@@ -118,6 +129,23 @@ export default function Homepage() {
             </Grid>
           </Grid>
         </Container>
+
+        {isLoggedIn && (
+          <Fab
+            color="primary"
+            onClick={() => setModalOpen(true)}
+            sx={{
+              position: "fixed",
+              bottom: 20,
+              right: 20,
+              zIndex: 1300,
+            }}
+          >
+            <AddIcon />
+          </Fab>
+        )}
+
+        <BroadcastModal open={modalOpen} onClose={() => setModalOpen(false)} />
       </Box>
     </Box>
   );
