@@ -167,6 +167,13 @@ export default function StreamChat() {
           top:"1%",
           height:"1800px",
           }
+           ,'@media (max-width:1024px-424px)': {
+           position:"absolute",
+          left:"72%",
+          top:"4%",
+          height:"1800px",
+          }
+          
         }}
       >
         {/* Header */}

@@ -18,9 +18,6 @@ import RecommendedVideos from "../../components/recommended/RecommendedVideos";
 import Sidebar from '../../components/sidebar/Sidebar'
 
 
-
-
-
 export default function Main() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
