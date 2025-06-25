@@ -13,9 +13,9 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 
-export default function Header({ searchOnly }) {
+export default function Header({ searchOnly ,}) {
   return (
-    <Box
+    <Box 
       sx={{
         justifyContent:"space-between",
         display: "flex",
@@ -38,7 +38,12 @@ export default function Header({ searchOnly }) {
       {!searchOnly && (
         <Typography
           variant="h6"
-          sx={{ color: "white", display: { xs: "none", sm: "block" },position:"absolute",left:"21%", }}
+          sx={{ color: "white", display: { xs: "none", sm: "block" },position:"absolute",left:"21%",    
+        '@media (max-width:1370px)': {
+        
+         position:"absolute",
+         left:"10%",
+        },}}
         >
           Browse
         </Typography>
