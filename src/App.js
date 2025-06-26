@@ -10,6 +10,7 @@ import LiveStreamLobby from "./pages/LiveStreamLobby";
 import FollowPage from "./pages/FollowPage";
 import TrendingPage from "./pages/TrendingPage";
 import VideoPage from "./pages/VideoPage";
+import Playlist from "./pages/Playlist";
 
 function App() {
   const [mode, setMode] = useState("light");
@@ -43,9 +44,10 @@ function App() {
           <Route path="/streamix" element={<Homepage />} />
           <Route path="/my-videos" element={<MyVideos />} />
           <Route path="/livestrem" element={<LiveStreamLobby />} />
-          <Route path="/profiles" element={<FollowPage />} />
+          <Route path="/FollowPage" element={<FollowPage />} />
           <Route path="/VideoPage" element={<VideoPage />} />
           <Route path="/TrendingPage" element={<TrendingPage />} />
+           <Route path="/playlist" element={<Playlist />} />
         </Routes>
       </Router>
     </ThemeProvider>

@@ -50,7 +50,7 @@ export default function Homepage() {
       }}
     >
       <CssBaseline />
-      <ToastContainer position="top-center" />
+      <ToastContainer position="top-right" />
 
     {!isMobile && (
   <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>

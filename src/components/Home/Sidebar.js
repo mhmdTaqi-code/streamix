@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Typography,
@@ -27,40 +28,37 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../../redux/reducers/themeReducer";
 import { SIDEBAR_WIDTH } from "../../redux/type";
+import { toast } from "react-toastify";
 
 const menuItems = [
   { icon: <Home />, text: "Home", link: "/home" },
   { icon: <Whatshot />, text: "Trending", link: "/TrendingPage" },
   { icon: <Subscriptions />, text: "Following", link: "/profiles" },
   { icon: <VideoLibrary />, text: "Your Videos", link: "/my-videos" },
-  { icon: <VideoLibrary />, text: "Playlist", link: "/VideoPage" },
-];
-
-const following = [
-  "Dylan Hodges",
-  "Vincent Parks",
-  "Richard Bowers",
-  "Isaac Lambert",
-  "Lillie Nash",
-  "Edith Cain",
-  "Jerry Sherman",
+  { icon: <VideoLibrary />, text: "Playlist", link: "/playlast" },
 ];
 
 export default function Sidebar() {
+  const [username, setUsername] = useState("");
+  const [following, setFollowing] = useState([]);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
 
-  const [username, setUsername] = useState("");
-  const navigate = useNavigate();
+  const isGuest = username === "Guest";
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
-    const isGuest = localStorage.getItem("isGuest");
+    const guest = localStorage.getItem("isGuest");
 
     if (storedUsername) {
       setUsername(storedUsername);
-    } else if (isGuest === "true") {
+      axios
+        .get(`https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/following/`)
+        .then((res) => setFollowing(res.data))
+        .catch((err) => console.error("Error fetching following:", err));
+    } else if (guest === "true") {
       setUsername("Guest");
     } else {
       setUsername("Guest");
@@ -77,6 +75,14 @@ export default function Sidebar() {
 
   const handleLogin = () => {
     navigate("/login");
+  };
+
+  const handleProtectedNavigation = (link) => {
+    if (isGuest) {
+      toast.info("يجب تسجيل الدخول أولاً.");
+    } else {
+      navigate(link);
+    }
   };
 
   return (
@@ -108,7 +114,6 @@ export default function Sidebar() {
         gutterBottom
         sx={{
           fontWeight: "bold",
-          direction: "ltr",
           alignItems: "center",
           display: "flex",
           flexDirection: "row",
@@ -123,7 +128,6 @@ export default function Sidebar() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          direction: "ltr",
           gap: 1,
           mb: 2,
         }}
@@ -175,13 +179,19 @@ export default function Sidebar() {
         التبديل إلى {darkMode ? "الوضع الفاتح" : "الوضع الليلي"}
       </Button>
 
-      <List>
+      <List style={{cursor: 'pointer'}} >
         {menuItems.map((item, index) => (
           <ListItem
             button
             key={index}
             sx={{ borderRadius: 2 }}
-            onClick={() => navigate(item.link)}
+            onClick={() => {
+              if (item.text === "Playlist" || item.text === "Your Videos" || item.text === "Following") {
+                handleProtectedNavigation(item.link);
+              } else {
+                navigate(item.link);
+              }
+            }}
           >
             <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
               {item.icon}
@@ -200,22 +210,36 @@ export default function Sidebar() {
         Following
       </Typography>
 
-      <List>
-        {following.map((name, index) => (
-          <ListItem button key={index} sx={{ borderRadius: 2 }}>
-            <ListItemIcon>
-              <Avatar sx={{ width: 24, height: 24 }} />
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}>
-                  {name}
-                </Typography>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
+      {isGuest ? (
+        <Typography sx={{ color: darkMode ? "#999" : "#444", fontSize: 14 }}>
+          يجب تسجيل الدخول لعرض المتابعين.
+        </Typography>
+      ) : following.length === 0 ? (
+        <Typography sx={{ color: darkMode ? "#999" : "#444", fontSize: 14 }}>
+          لا يوجد متابعين.
+        </Typography>
+      ) : (
+        <List>
+          {following.map((user, index) => (
+            <ListItem button key={index} sx={{ borderRadius: 2 }}>
+              <ListItemIcon>
+                <Avatar
+                  sx={{ width: 24, height: 24 }}
+                  src={user.profile_picture?.startsWith("http") ? user.profile_picture : `https://dev1hunter.pythonanywhere.com${user.profile_picture}`}
+                  alt={user.username}
+                />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}>
+                    {user.username}
+                  </Typography>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      )}
 
       <Divider sx={{ my: 2, bgcolor: darkMode ? "#444" : "#e0e0e0" }} />
 

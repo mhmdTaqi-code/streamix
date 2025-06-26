@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import Sidebar from "../components/Home/Sidebar";
 import { SIDEBAR_WIDTH } from "../redux/type";
+import { ToastContainer } from "react-toastify";
 
 
 const mockTrendingVideos = [
@@ -82,7 +83,7 @@ export default function TrendingPage() {
             },
           }}
         >
-        
+     
   <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>
     <Sidebar includeProfileAndNotifications={true} />
   </Box>
@@ -150,7 +151,7 @@ export default function TrendingPage() {
               Trending Videos
             </Typography>
           </motion.div>
-
+  <ToastContainer position="top-right" /> 
           <Box
             sx={{
               display: "grid",

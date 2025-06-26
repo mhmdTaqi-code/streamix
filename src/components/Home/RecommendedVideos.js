@@ -12,6 +12,8 @@ import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 
+
+
 const recommended = [
   {
     title: "Warzone Highlights",

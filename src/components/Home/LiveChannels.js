@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Typography,
@@ -10,20 +11,43 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
-
-const channels = [
-  { game: "Call of Duty", image: "https://i.imgur.com/WfJXj8V.jpg" },
-  { game: "Garena of Valor", image: "https://i.imgur.com/E1rxy4E.jpg" },
-  { game: "Call of Duty", image: "https://i.imgur.com/WfJXj8V.jpg" },
-  { game: "Garena Free Fire", image: "https://i.imgur.com/Zj5V8Gb.jpg" },
-];
+import { useNavigate } from "react-router-dom";
 
 export default function LiveChannels() {
+  const [channels, setChannels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
 
-  // نكرر القائمة مرتين حتى تبين مستمرة
+  useEffect(() => {
+    axios
+      .get("https://devbaker123.pythonanywhere.com/live/api/videos/")
+      .then((response) => {
+        setChannels(response.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Failed to fetch channels");
+        setLoading(false);
+      });
+  }, []);
+
   const extendedChannels = [...channels, ...channels];
+
+  if (loading) {
+    return <Typography sx={{ px: 2 }}>Loading channels...</Typography>;
+  }
+
+  if (error) {
+    return (
+      <Typography sx={{ px: 2 }} color="error">
+        {error}
+      </Typography>
+    );
+  }
 
   return (
     <Box sx={{ px: 2, mb: 4, overflow: "hidden" }}>
@@ -51,7 +75,6 @@ export default function LiveChannels() {
         />
       </Box>
 
-      {/* شريط متحرك */}
       <Box sx={{ position: "relative", width: "100%", overflow: "hidden" }}>
         <motion.div
           style={{ display: "flex", gap: 16 }}
@@ -64,35 +87,47 @@ export default function LiveChannels() {
         >
           {extendedChannels.map((channel, index) => (
             <Card
-              key={index}
+              key={`${channel.id}-${index}`}
+              onClick={() => navigate(`/video/${channel.id}`)}
               sx={{
                 minWidth: 240,
                 bgcolor: darkMode ? "#1e1e1e" : "#fafafa",
                 color: darkMode ? "#fff" : "#000",
                 borderRadius: 2,
+                cursor: "pointer",
                 boxShadow: darkMode
                   ? "0 6px 12px rgba(255,255,255,0.04)"
                   : "0 6px 12px rgba(0,0,0,0.08)",
+                transition: "transform 0.2s ease",
+                "&:hover": {
+                  transform: "scale(1.03)",
+                },
               }}
             >
               <CardMedia
                 component="img"
                 height="140"
-                image={channel.image}
-                alt={channel.game}
+                image={channel.thumbnail}
+                alt={channel.title}
               />
               <CardContent>
                 <Chip label="Live" color="error" size="small" sx={{ mb: 1 }} />
                 <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                  {channel.game}
+                  {channel.title}
                 </Typography>
+
                 <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-                  <Avatar sx={{ width: 20, height: 20, mr: 1 }} />
+                  <Avatar sx={{ width: 20, height: 20, mr: 1 }}>
+                    {typeof channel.uploader === "string" &&
+                    channel.uploader.length > 0
+                      ? channel.uploader.charAt(0)
+                      : "?"}
+                  </Avatar>
                   <Typography
                     variant="caption"
                     sx={{ color: darkMode ? "#ccc" : "text.secondary" }}
                   >
-                    4.2K watching
+                    {channel.uploader} - 4.2K watching
                   </Typography>
                 </Box>
               </CardContent>
