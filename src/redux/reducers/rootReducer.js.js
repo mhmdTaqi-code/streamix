@@ -1,4 +1,7 @@
 import { combineReducers } from "redux";
 import AuthReduser from "./AuthReducer"
 import CatgReducer from "./catgReducer";
-export default combineReducers({authReducer:AuthReduser , catg:CatgReducer })
+import themeReducer from "./themeReducer";
+
+
+export default combineReducers({authReducer:AuthReduser ,    theme: themeReducer,catg:CatgReducer })

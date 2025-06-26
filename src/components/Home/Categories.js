@@ -1,42 +1,48 @@
 import React, { useEffect } from "react";
-import { Box, Typography, Grid, Card, CardMedia, CardContent } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+} from "@mui/material";
 import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import GETALLCAT from './../../redux/action/CatgAction';
-import { axios } from 'axios';
-import Baseurl from './../../Api/BaceUrl';
+import GETALLCAT from "../../redux/action/CatgAction";
+import Baseurl from "../../Api/BaceUrl";
 
 export default function Categories() {
+  const dispatch = useDispatch();
 
+  const { catg: categories, isLoading } = useSelector((state) => state.catg);
+  const mode = useSelector((state) => state.theme.mode);
+  const darkMode = mode === "dark";
 
-const a = async () => {
-  const res = await Baseurl.get("/live/api/streams/?categories=1");
-  console.log(res.data);    
-};
+  const fetchSample = async () => {
+    const res = await Baseurl.get("/live/api/streams/?categories=1");
+    console.log(res.data);
+  };
 
+  useEffect(() => {
+    dispatch(GETALLCAT());
+    fetchSample();
+  }, []);
 
-
-
-const { catg: categories, isLoading } = useSelector(state => state.catg);
-const dispatch = useDispatch()
-
-useEffect(()=>{
-dispatch(GETALLCAT())
-a()
-},[])
-
-useEffect(() => {
-  console.log("Updated categories: ", categories);
-}, [categories]);
-
-
-
-
+  useEffect(() => {
+    console.log("Updated categories: ", categories);
+  }, [categories]);
 
   return (
     <Box sx={{ px: 2, mb: 4 }}>
-      <Typography variant="h6" sx={{ color: "#000", mb: 2 }}>Categories</Typography>
+      <Typography
+        variant="h6"
+        sx={{ color: darkMode ? "#fff" : "#000", mb: 2 }}
+      >
+        Categories
+      </Typography>
+
       <Grid container spacing={2}>
         {categories.map((cat, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
@@ -48,10 +54,12 @@ useEffect(() => {
               >
                 <Card
                   sx={{
-                    bgcolor: "#fafafa",
-                    color: "#000",
+                    bgcolor: darkMode ? "#1e1e1e" : "#fafafa",
+                    color: darkMode ? "#fff" : "#000",
                     borderRadius: 2,
-                    boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+                    boxShadow: darkMode
+                      ? "0 8px 20px rgba(255,255,255,0.05)"
+                      : "0 8px 20px rgba(0,0,0,0.1)",
                   }}
                 >
                   <CardMedia
@@ -61,7 +69,10 @@ useEffect(() => {
                     alt={cat.title}
                   />
                   <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 500, color: darkMode ? "#fff" : "#000" }}
+                    >
                       {cat.title}
                     </Typography>
                   </CardContent>

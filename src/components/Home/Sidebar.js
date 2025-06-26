@@ -18,20 +18,22 @@ import {
   VideoLibrary,
   Settings,
   Chat,
-  Notifications,
   AccountCircle,
   Logout,
   Login,
 } from "@mui/icons-material";
 import logo from "../../assets/1.png";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../../redux/reducers/themeReducer";
+import { SIDEBAR_WIDTH } from "../../redux/type";
 
 const menuItems = [
-  { icon: <Home />, text: "New Feed" },
-  { icon: <Whatshot />, text: "Trending" },
-  { icon: <Subscriptions />, text: "Following" },
-  { icon: <VideoLibrary />, text: "Your Videos" },
-  { icon: <VideoLibrary />, text: "Playlist" },
+  { icon: <Home />, text: "Home", link: "/home" },
+  { icon: <Whatshot />, text: "Trending", link: "/TrendingPage" },
+  { icon: <Subscriptions />, text: "Following", link: "/profiles" },
+  { icon: <VideoLibrary />, text: "Your Videos", link: "/my-videos" },
+  { icon: <VideoLibrary />, text: "Playlist", link: "/VideoPage" },
 ];
 
 const following = [
@@ -45,6 +47,10 @@ const following = [
 ];
 
 export default function Sidebar() {
+  const dispatch = useDispatch();
+  const mode = useSelector((state) => state.theme.mode);
+  const darkMode = mode === "dark";
+
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
@@ -55,9 +61,9 @@ export default function Sidebar() {
     if (storedUsername) {
       setUsername(storedUsername);
     } else if (isGuest === "true") {
-      setUsername("ضيف");
+      setUsername("Guest");
     } else {
-      setUsername("ضيف");
+      setUsername("Guest");
     }
   }, []);
 
@@ -76,21 +82,23 @@ export default function Sidebar() {
   return (
     <Box
       sx={{
-        width: 240,
-        bgcolor: "#f9f9f9",
-        color: "#000",
+        width: SIDEBAR_WIDTH,
+        bgcolor: darkMode ? "#1e1e1e" : "#fff",
+        color: darkMode ? "#fff" : "#000",
+        borderRight: `1px solid ${darkMode ? "#333" : "#ddd"}`,
         height: "100vh",
         p: 2,
-        borderRight: "1px solid #e0e0e0",
         position: "sticky",
         top: 0,
         overflowY: "auto",
-        direction: "rtl",
+        direction: "ltr",
         "& *": { direction: "ltr" },
         "&::-webkit-scrollbar": { width: "8px" },
-        "&::-webkit-scrollbar-track": { background: "#f0f0f0" },
+        "&::-webkit-scrollbar-track": {
+          background: darkMode ? "#2c2c2c" : "#f0f0f0",
+        },
         "&::-webkit-scrollbar-thumb": {
-          backgroundColor: "#c1c1c1",
+          backgroundColor: darkMode ? "#555" : "#c1c1c1",
           borderRadius: "4px",
         },
       }}
@@ -100,7 +108,7 @@ export default function Sidebar() {
         gutterBottom
         sx={{
           fontWeight: "bold",
-          direction: "rtl",
+          direction: "ltr",
           alignItems: "center",
           display: "flex",
           flexDirection: "row",
@@ -110,21 +118,31 @@ export default function Sidebar() {
         STREAMIX <img style={{ width: "50px" }} src={logo} alt="logo" />
       </Typography>
 
-      {/* اسم المستخدم وزر الدخول/الخروج */}
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", direction: "rtl", gap: 1, mb: 2 }}>
-        <Typography variant="body1" fontWeight="bold">{username}</Typography>
-        <IconButton sx={{ color: "#000" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          direction: "ltr",
+          gap: 1,
+          mb: 2,
+        }}
+      >
+        <Typography variant="body1" fontWeight="bold">
+          {username}
+        </Typography>
+        <IconButton sx={{ color: darkMode ? "#fff" : "#000" }}>
           <AccountCircle />
         </IconButton>
       </Box>
 
-      {username === "ضيف" ? (
+      {username === "Guest" ? (
         <Button
           variant="outlined"
           fullWidth
           startIcon={<Login />}
           onClick={handleLogin}
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, color: darkMode ? "#fff" : "#000", borderColor: darkMode ? "#777" : "#ccc" }}
         >
           تسجيل الدخول
         </Button>
@@ -141,19 +159,44 @@ export default function Sidebar() {
         </Button>
       )}
 
-      {/* القائمة الرئيسية */}
+      <Button
+        variant="contained"
+        fullWidth
+        onClick={() => dispatch(toggleTheme())}
+        sx={{
+          mb: 2,
+          bgcolor: darkMode ? "#333" : "#1976d2",
+          color: "#fff",
+          "&:hover": {
+            bgcolor: darkMode ? "#444" : "#1565c0",
+          },
+        }}
+      >
+        التبديل إلى {darkMode ? "الوضع الفاتح" : "الوضع الليلي"}
+      </Button>
+
       <List>
         {menuItems.map((item, index) => (
-          <ListItem button key={index} sx={{ borderRadius: 2 }}>
-            <ListItemIcon sx={{ color: "#000" }}>{item.icon}</ListItemIcon>
+          <ListItem
+            button
+            key={index}
+            sx={{ borderRadius: 2 }}
+            onClick={() => navigate(item.link)}
+          >
+            <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
+              {item.icon}
+            </ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
       </List>
 
-      <Divider sx={{ my: 2, bgcolor: "#e0e0e0" }} />
+      <Divider sx={{ my: 2, bgcolor: darkMode ? "#444" : "#e0e0e0" }} />
 
-      <Typography variant="subtitle2" sx={{ color: "#666", mb: 1 }}>
+      <Typography
+        variant="subtitle2"
+        sx={{ color: darkMode ? "#aaa" : "#666", mb: 1 }}
+      >
         Following
       </Typography>
 
@@ -164,23 +207,27 @@ export default function Sidebar() {
               <Avatar sx={{ width: 24, height: 24 }} />
             </ListItemIcon>
             <ListItemText
-              primary={<Typography sx={{ fontSize: 14 }}>{name}</Typography>}
+              primary={
+                <Typography sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}>
+                  {name}
+                </Typography>
+              }
             />
           </ListItem>
         ))}
       </List>
 
-      <Divider sx={{ my: 2, bgcolor: "#e0e0e0" }} />
+      <Divider sx={{ my: 2, bgcolor: darkMode ? "#444" : "#e0e0e0" }} />
 
       <List>
         <ListItem button>
-          <ListItemIcon sx={{ color: "#000" }}>
+          <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
             <Chat />
           </ListItemIcon>
           <ListItemText primary="Chat" />
         </ListItem>
         <ListItem button>
-          <ListItemIcon sx={{ color: "#000" }}>
+          <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
             <Settings />
           </ListItemIcon>
           <ListItemText primary="Settings" />

@@ -1,37 +1,53 @@
 import React from "react";
-import { Box, Typography, Grid, Card, CardMedia, CardContent, Avatar } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Avatar,
+} from "@mui/material";
 import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
 
 const recommended = [
   {
     title: "Warzone Highlights",
     image: "https://i.imgur.com/BY0n7Zx.jpg",
-    streamer: "AvaDrex"
+    streamer: "AvaDrex",
   },
   {
     title: "Epic LoL Battles",
     image: "https://i.imgur.com/4EZbn4V.jpg",
-    streamer: "GamerQueen"
+    streamer: "GamerQueen",
   },
   {
     title: "Best Snipes 2024",
     image: "https://i.imgur.com/Nfzkfvl.jpg",
-    streamer: "SniperWolf"
+    streamer: "SniperWolf",
   },
   {
     title: "Underrated Gems",
     image: "https://i.imgur.com/s0kYIgh.jpg",
-    streamer: "ChadMaster"
-  }
+    streamer: "ChadMaster",
+  },
 ];
 
 export default function RecommendedVideos() {
+  const mode = useSelector((state) => state.theme.mode);
+  const darkMode = mode === "dark";
+
   return (
     <Box sx={{ px: 2, mb: 4 }}>
-      <Typography variant="h6" sx={{ color: "#000", mb: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{ color: darkMode ? "#fff" : "#000", mb: 2 }}
+      >
         Recommended for You
       </Typography>
+
       <Grid container spacing={2}>
         {recommended.map((video, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
@@ -43,10 +59,12 @@ export default function RecommendedVideos() {
               >
                 <Card
                   sx={{
-                    bgcolor: "#fafafa",
-                    color: "#000",
+                    bgcolor: darkMode ? "#1e1e1e" : "#fafafa",
+                    color: darkMode ? "#fff" : "#000",
                     borderRadius: 2,
-                    boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+                    boxShadow: darkMode
+                      ? "0 8px 20px rgba(255,255,255,0.05)"
+                      : "0 8px 20px rgba(0,0,0,0.1)",
                   }}
                 >
                   <CardMedia
@@ -61,7 +79,10 @@ export default function RecommendedVideos() {
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                       <Avatar sx={{ width: 24, height: 24, mr: 1 }} />
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography
+                        variant="caption"
+                        sx={{ color: darkMode ? "#ccc" : "text.secondary" }}
+                      >
                         {video.streamer}
                       </Typography>
                     </Box>

@@ -1,5 +1,3 @@
-// File: src/pages/Homepage.jsx
-
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -23,6 +21,8 @@ import Categories from "../components/Home/Categories";
 import RecommendedVideos from "../components/Home/RecommendedVideos";
 import BroadcastModal from "../components/Home/BroadcastModal";
 import { ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
+import { SIDEBAR_WIDTH } from "../redux/type";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Homepage() {
@@ -30,6 +30,9 @@ export default function Homepage() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const mode = useSelector((state) => state.theme.mode);
+  const darkMode = mode === "dark";
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -40,7 +43,7 @@ export default function Homepage() {
     <Box
       sx={{
         display: "flex",
-        bgcolor: "light",
+        bgcolor: darkMode ? "#121212" : "#fff",
         flexDirection: isMobile ? "column" : "row",
         height: "100vh",
         overflow: "hidden",
@@ -49,7 +52,12 @@ export default function Homepage() {
       <CssBaseline />
       <ToastContainer position="top-center" />
 
-      {!isMobile && <Sidebar includeProfileAndNotifications={true} />}
+    {!isMobile && (
+  <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>
+    <Sidebar includeProfileAndNotifications={true} />
+  </Box>
+)}
+
 
       {isMobile && (
         <Drawer
@@ -63,8 +71,8 @@ export default function Homepage() {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: 240,
-              bgcolor: "#161616",
-              color: "white",
+              bgcolor: darkMode ? "#121212" : "#f9f9f9",
+              color: darkMode ? "#fff" : "#000",
               height: "100vh",
               position: "fixed",
               top: 0,
@@ -88,7 +96,12 @@ export default function Homepage() {
       >
         <AppBar
           position="sticky"
-          sx={{ bgcolor: "#f5f5f5", boxShadow: "none", height: "56px", zIndex: 1100 }}
+          sx={{
+            bgcolor: darkMode ? "#1e1e1e" : "#f5f5f5",
+            boxShadow: "none",
+            height: "56px",
+            zIndex: 1100,
+          }}
         >
           <Toolbar
             sx={{
@@ -106,7 +119,7 @@ export default function Homepage() {
               onClick={() => setMobileOpen(!mobileOpen)}
               sx={{ p: 0, display: { xs: "inline-flex", md: "none" } }}
             >
-              <MenuIcon sx={{ color: "black", fontSize: 24, marginLeft: "20px" }} />
+              <MenuIcon sx={{ color: darkMode ? "#fff" : "#000", fontSize: 24 }} />
             </IconButton>
             <Box sx={{ flexGrow: 1, px: 1 }}>
               <Header searchOnly={isMobile} />

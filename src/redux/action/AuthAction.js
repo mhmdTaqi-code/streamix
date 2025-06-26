@@ -1,4 +1,3 @@
-// File: src/redux/actions/authActions.js
 import axios from "axios";
 import { LOGIN_USER } from "../type";
 
