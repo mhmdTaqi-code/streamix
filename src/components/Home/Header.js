@@ -1,21 +1,33 @@
-import React from "react";
-import {
-  Box,
-  Typography,
-  InputBase,
-  IconButton,
-  Badge,
-} from "@mui/material";
-import {
-  Search,
-  Notifications,
-  AccountCircle,
-} from "@mui/icons-material";
+import React, { useState, useEffect } from "react";
+import { Box, Typography, InputBase } from "@mui/material";
+import { Search } from "@mui/icons-material";
 import { useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Header({ searchOnly }) {
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getInitialQuery = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get("q") || "";
+  };
+
+  const [query, setQuery] = useState(getInitialQuery());
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (query.trim() !== "") {
+        navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+      } else {
+        navigate("/home");
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [query, navigate]);
 
   return (
     <Box
@@ -26,7 +38,6 @@ export default function Header({ searchOnly }) {
         gap: 1,
       }}
     >
-      {/* Browse Title (hidden on small screens) */}
       {!searchOnly && (
         <Typography
           variant="h6"
@@ -40,7 +51,6 @@ export default function Header({ searchOnly }) {
         </Typography>
       )}
 
-      {/* Search Bar */}
       <Box sx={{ position: "relative", flex: 1 }}>
         <Search
           sx={{
@@ -54,6 +64,8 @@ export default function Header({ searchOnly }) {
         />
         <InputBase
           placeholder="Search Everything"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           sx={{
             width: "100%",
             bgcolor: darkMode ? "#2a2a2a" : "#eeeeee",
@@ -66,13 +78,6 @@ export default function Header({ searchOnly }) {
           }}
         />
       </Box>
-
-      {/* (Optional future additions like notifications/account) */}
-      {/* <IconButton sx={{ color: darkMode ? "#fff" : "#000" }}>
-        <Badge badgeContent={1} color="error">
-          <Notifications />
-        </Badge>
-      </IconButton> */}
     </Box>
   );
 }

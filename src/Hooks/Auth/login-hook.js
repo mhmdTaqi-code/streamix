@@ -22,7 +22,7 @@ const useLoginHook = () => {
     setLoading(true); // بدأ التحميل
     try {
       const res = await Baseurl.post(
-        "https://devhunter123.pythonanywhere.com/api/login/",
+        "/api/login/",
         { username, password },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -34,7 +34,7 @@ const useLoginHook = () => {
       localStorage.setItem("refreshToken", refreshToken);
 
       notify("تم تسجيل الدخول بنجاح", "success");
-      localStorage.setItem("username", username); 
+      localStorage.setItem("username", username);
       setTimeout(() => {
         navigate("/home");
         setLoading(false); // انتهى التحميل
@@ -49,7 +49,7 @@ const useLoginHook = () => {
   return {
     email: username,
     password,
-    loading, 
+    loading,
     onChangeEmail,
     onChangePassword,
     onSubmit,

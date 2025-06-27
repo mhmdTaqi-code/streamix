@@ -41,7 +41,7 @@ const menuItems = [
   { icon: <Whatshot />, text: "Trending", link: "/TrendingPage" },
   { icon: <Subscriptions />, text: "Following", link: "/profiles" },
   { icon: <VideoLibrary />, text: "Your Videos", link: "/my-videos" },
-  { icon: <VideoLibrary />, text: "Playlist", link: "/playlast" },
+  { icon: <VideoLibrary />, text: "Playlist", link: "/playlist" },
 ];
 
 export default function Sidebar() {
@@ -61,7 +61,9 @@ export default function Sidebar() {
     if (storedUsername) {
       setUsername(storedUsername);
       axios
-        .get(`https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/following/`)
+        .get(
+          `https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/following/`
+        )
         .then((res) => setFollowing(res.data))
         .catch((err) => console.error("Error fetching following:", err));
     } else if (guest === "true") {
@@ -149,7 +151,12 @@ export default function Sidebar() {
         </IconButton>
       </Box>
 
-      <Tooltip title={darkMode ? "الوضع الفاتح" : "الوضع الداكن"} arrow placement="top" TransitionComponent={Fade}>
+      <Tooltip
+        title={darkMode ? "الوضع الفاتح" : "الوضع الداكن"}
+        arrow
+        placement="top"
+        TransitionComponent={Fade}
+      >
         <Button
           fullWidth
           startIcon={darkMode ? <Brightness7 /> : <Brightness4 />}
@@ -173,7 +180,11 @@ export default function Sidebar() {
           fullWidth
           startIcon={<Login />}
           onClick={handleLogin}
-          sx={{ mb: 2, color: darkMode ? "#fff" : "#000", borderColor: darkMode ? "#777" : "#ccc" }}
+          sx={{
+            mb: 2,
+            color: darkMode ? "#fff" : "#000",
+            borderColor: darkMode ? "#777" : "#ccc",
+          }}
         >
           تسجيل الدخول
         </Button>
@@ -190,14 +201,16 @@ export default function Sidebar() {
         </Button>
       )}
 
-      <List style={{ cursor: 'pointer' }}>
+      <List style={{ cursor: "pointer" }}>
         {menuItems.map((item, index) => (
           <ListItem
             button
             key={index}
             sx={{ borderRadius: 2 }}
             onClick={() => {
-              if (["Playlist", "Your Videos", "Following"].includes(item.text)) {
+              if (
+                ["Playlist", "Your Videos", "Following"].includes(item.text)
+              ) {
                 handleProtectedNavigation(item.link);
               } else {
                 navigate(item.link);
@@ -214,7 +227,10 @@ export default function Sidebar() {
 
       <Divider sx={{ my: 2, bgcolor: darkMode ? "#444" : "#e0e0e0" }} />
 
-      <Typography variant="subtitle2" sx={{ color: darkMode ? "#aaa" : "#666", mb: 1 }}>
+      <Typography
+        variant="subtitle2"
+        sx={{ color: darkMode ? "#aaa" : "#666", mb: 1 }}
+      >
         Following
       </Typography>
 
@@ -233,12 +249,22 @@ export default function Sidebar() {
               <ListItemIcon>
                 <Avatar
                   sx={{ width: 24, height: 24 }}
-                  src={user.profile_picture?.startsWith("http") ? user.profile_picture : `https://dev1hunter.pythonanywhere.com${user.profile_picture}`}
+                  src={
+                    user.profile_picture?.startsWith("http")
+                      ? user.profile_picture
+                      : `https://dev1hunter.pythonanywhere.com${user.profile_picture}`
+                  }
                   alt={user.username}
                 />
               </ListItemIcon>
               <ListItemText
-                primary={<Typography sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}>{user.username}</Typography>}
+                primary={
+                  <Typography
+                    sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}
+                  >
+                    {user.username}
+                  </Typography>
+                }
               />
             </ListItem>
           ))}

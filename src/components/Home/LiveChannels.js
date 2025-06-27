@@ -1,3 +1,4 @@
+// File: src/components/Home/LiveChannels.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -59,10 +60,7 @@ export default function LiveChannels() {
           mb: 2,
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ color: darkMode ? "#fff" : "#000" }}
-        >
+        <Typography variant="h6" sx={{ color: darkMode ? "#fff" : "#000" }}>
           Live channels
         </Typography>
         <Chip
@@ -88,7 +86,16 @@ export default function LiveChannels() {
           {extendedChannels.map((channel, index) => (
             <Card
               key={`${channel.id}-${index}`}
-              onClick={() => navigate(`/video/${channel.id}`)}
+              onClick={() =>
+                navigate("/live", {
+                  state: {
+                    youtubeId: channel.youtube_id,
+                    title: channel.title,
+                    thumbnail: channel.thumbnail,
+                    uploader: channel.uploader,
+                  },
+                })
+              }
               sx={{
                 minWidth: 240,
                 bgcolor: darkMode ? "#1e1e1e" : "#fafafa",

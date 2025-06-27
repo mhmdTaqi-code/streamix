@@ -1,5 +1,5 @@
 // File: src/components/Home/BroadcastModal.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Modal,
@@ -7,38 +7,84 @@ import {
   TextField,
   Button,
   MenuItem,
+  InputLabel,
 } from "@mui/material";
 import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
 import { toast } from "react-toastify";
-
-const statusOptions = [
-  { label: "مباشر", value: "live" },
-  { label: "قادم", value: "upcoming" },
-  { label: "انتهى", value: "ended" },
-];
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function BroadcastModal({ open, onClose }) {
   const [title, setTitle] = useState("");
   const [youtubeId, setYoutubeId] = useState("");
   const [status, setStatus] = useState("live");
   const [category, setCategory] = useState("");
+  const [thumbnail, setThumbnail] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  const navigate = useNavigate();
+
+  // تحميل الفئات من API
+  useEffect(() => {
+    axios
+      .get("https://dev1hunter.pythonanywhere.com/live/api/categories/")
+      .then((res) => {
+        const unique = Array.from(
+          new Set(res.data.map((item) => item.name))
+        ).map((name) => res.data.find((item) => item.name === name));
+        setCategories(unique);
+      })
+      .catch(() => toast.error("فشل في تحميل الفئات"));
+  }, []);
 
   const handleSubmit = () => {
-    if (!title || !youtubeId || !status || !category) {
-      toast.error("يرجى ملء جميع الحقول");
+    if (!title || !youtubeId || !status || !category || !thumbnail) {
+      toast.error("يرجى ملء جميع الحقول ورفع الصورة");
       return;
     }
 
-    const streamData = { title, youtubeId, status, category };
-    console.log("📡 بث جديد:", streamData);
-    toast.success("تم نشر البث بنجاح");
+    if (!["image/jpeg", "image/png"].includes(thumbnail.type)) {
+      toast.error("يرجى رفع صورة بصيغة JPG أو PNG");
+      return;
+    }
 
-    // reset & close
-    setTitle("");
-    setYoutubeId("");
-    setStatus("live");
-    setCategory("");
-    onClose();
+    const token = localStorage.getItem("accessToken");
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("youtube_id", youtubeId);
+    formData.append("status", status);
+    formData.append("category", category); // ID الفئة
+    formData.append("thumbnail", thumbnail);
+
+    axios
+      .post(
+        "https://dev1hunter.pythonanywhere.com/live/api/streams/",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then(() => {
+        toast.success("تم نشر البث بنجاح ✅");
+        // إعادة التهيئة
+        setTitle("");
+        setYoutubeId("");
+        setStatus("live");
+        setCategory("");
+        setThumbnail(null);
+        onClose();
+
+        // الانتقال لصفحة البث مع اليوتيوب ID
+        navigate("/live", { state: { youtubeId } });
+      })
+      .catch((err) => {
+        toast.error("فشل نشر البث");
+        console.error(err);
+      });
   };
 
   return (
@@ -72,7 +118,7 @@ export default function BroadcastModal({ open, onClose }) {
         />
 
         <TextField
-          label="Youtube id"
+          label="Youtube ID"
           fullWidth
           value={youtubeId}
           onChange={(e) => setYoutubeId(e.target.value)}
@@ -87,11 +133,9 @@ export default function BroadcastModal({ open, onClose }) {
           onChange={(e) => setStatus(e.target.value)}
           sx={{ mb: 2 }}
         >
-          {statusOptions.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
+          <MenuItem value="live">مباشر</MenuItem>
+          <MenuItem value="upcoming">قادم</MenuItem>
+          <MenuItem value="ended">انتهى</MenuItem>
         </TextField>
 
         <TextField
@@ -100,16 +144,25 @@ export default function BroadcastModal({ open, onClose }) {
           fullWidth
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          sx={{ mb: 3 }}
+          sx={{ mb: 2 }}
         >
           <MenuItem value="" disabled>
-            --------
+            اختر فئة
           </MenuItem>
-          <MenuItem value="tech">تقنية</MenuItem>
-          <MenuItem value="gaming">ألعاب</MenuItem>
-          <MenuItem value="education">تعليمي</MenuItem>
-          {/* يمكنك إضافة المزيد حسب الفئات لديك */}
+          {categories.map((cat) => (
+            <MenuItem key={cat.id} value={cat.id}>
+              {cat.name}
+            </MenuItem>
+          ))}
         </TextField>
+
+        <InputLabel sx={{ mb: 1 }}>Thumbnail</InputLabel>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setThumbnail(e.target.files[0])}
+          style={{ marginBottom: "20px" }}
+        />
 
         <Button fullWidth variant="contained" onClick={handleSubmit}>
           نشر البث
