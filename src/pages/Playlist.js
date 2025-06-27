@@ -24,16 +24,16 @@ import {
 import { Add as AddIcon, Menu as MenuIcon } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../components/Home/Sidebar";
 import { SIDEBAR_WIDTH } from "../redux/type";
+import axiosInstance from "../Api/axiosInstance";
 
 const getToken = () => localStorage.getItem("accessToken");
 const getUsername = () => localStorage.getItem("username") || "Unknown";
 
-const api = axios.create({
+const api = axiosInstance.create({
   baseURL: "https://dev1hunter.pythonanywhere.com/live/api/",
 });
 

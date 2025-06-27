@@ -1,18 +1,19 @@
-import { GetALLCatg, GetErr } from "../type";
-import Baseurl from "../../Api/BaceUrl"
+// File: redux/action/CatgAction.js
 
+import { GetALLCatg, GetErr } from "../type";
+import Baseurl from "../../Api/BaceUrl";
 
 const GETALLCAT = () => async (dispatch) => {
   try {
-    const res = await Baseurl.get("/live/api/streams/?categories=1");
-    console.log("API Response:", res.data); // افحص هنا شنو يرجّع
+    const res = await Baseurl.get("/live/api/categories/"); // ✅ التصحيح هنا
+    console.log("Categories API Response:", res.data);
 
     dispatch({
       type: GetALLCatg,
-      payload: res.data, // أو res.data.data حسب بنية الرد
+      payload: res.data, // بناءً على شكل API اللي انت أرسلته
     });
   } catch (e) {
-    console.error("API Error:", e);
+    console.error("Categories API Error:", e);
     dispatch({
       type: GetErr,
       payload: e.message || "Something went wrong",
@@ -20,4 +21,4 @@ const GETALLCAT = () => async (dispatch) => {
   }
 };
 
-export default GETALLCAT
+export default GETALLCAT;

@@ -36,6 +36,7 @@ export default function LiveChannels() {
       });
   }, []);
 
+  // لتكرار القنوات لعمل سكرول مستمر
   const extendedChannels = [...channels, ...channels];
 
   if (loading) {
@@ -86,16 +87,7 @@ export default function LiveChannels() {
           {extendedChannels.map((channel, index) => (
             <Card
               key={`${channel.id}-${index}`}
-              onClick={() =>
-                navigate("/live", {
-                  state: {
-                    youtubeId: channel.youtube_id,
-                    title: channel.title,
-                    thumbnail: channel.thumbnail,
-                    uploader: channel.uploader,
-                  },
-                })
-              }
+              onClick={() => navigate(`/live/${channel.youtube_id}`)}
               sx={{
                 minWidth: 240,
                 bgcolor: darkMode ? "#1e1e1e" : "#fafafa",

@@ -61,7 +61,7 @@ function App() {
           />
           <Route path="/streamix" element={<Homepage />} />
           <Route path="/my-videos" element={<MyVideos />} />
-          <Route path="/livestrem" element={<LiveStreamLobby />} />
+          <Route path="/live" element={<LiveStreamLobby />} />
           <Route path="/FollowPage" element={<FollowPage />} />
           <Route path="/VideoPage" element={<VideoPage />} />
           <Route path="/TrendingPage" element={<TrendingPage />} />

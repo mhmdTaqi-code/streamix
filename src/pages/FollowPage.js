@@ -1,5 +1,4 @@
-// File: src/pages/FollowPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -8,49 +7,97 @@ import {
   Paper,
   useMediaQuery,
   Drawer,
-  AppBar,
-  Toolbar,
-  IconButton
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "../components/Home/Sidebar";
 import { motion } from "framer-motion";
 import { SIDEBAR_WIDTH } from "../redux/type";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axiosInstance from "../Api/axiosInstance";
 
 export default function FollowPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [following, setFollowing] = useState([]);
+  const [loadingUnfollow, setLoadingUnfollow] = useState(null);
   const isMobile = useMediaQuery("(max-width:768px)");
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
 
-  const followingList = [
-    {
-      username: "ahmed123",
-      bio: "مصمم جرافيك ومحب للفن 🎨",
-      profile_picture: "https://via.placeholder.com/100",
-    },
-    {
-      username: "noor_ali",
-      bio: "مطورة ويب ومهتمة بالذكاء الاصطناعي 🤖",
-      profile_picture: "https://via.placeholder.com/100",
-    },
-    {
-      username: "zahraa_design",
-      bio: "مصممة واجهات وتجربة مستخدم 🌐",
-      profile_picture: "https://via.placeholder.com/100",
-    },
-  ];
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    const token = localStorage.getItem("accessToken");
+
+    if (!storedUsername || !token) {
+      toast.error("الرجاء تسجيل الدخول أولاً.");
+      return;
+    }
+
+    axiosInstance
+      .get(
+        `https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/following/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setFollowing(res.data || []);
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.detail || "فشل في تحميل قائمة المتابعة";
+        toast.error(msg);
+      });
+  }, []);
+
+  const handleUnfollow = async (username) => {
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      toast.error("الرجاء تسجيل الدخول أولاً.");
+      return;
+    }
+
+    setLoadingUnfollow(username);
+
+    try {
+      await axiosInstance.post(
+        `https://dev1hunter.pythonanywhere.com/unfollow/${username}/`,
+        {}, // جسم الطلب فارغ
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setFollowing((prev) => prev.filter((user) => user.username !== username));
+      toast.success(`تم إلغاء متابعة ${username}`, {
+        position: "bottom-right",
+      });
+    } catch (err) {
+      const msg = err.response?.data?.detail || "حدث خطأ أثناء إلغاء المتابعة";
+      toast.error(msg, { position: "bottom-right" });
+    } finally {
+      setLoadingUnfollow(null);
+    }
+  };
 
   return (
-    <Box sx={{ display: "flex", bgcolor: darkMode ? "#121212" : "#fff", minHeight: "100vh" }}>
-      {/* Sidebar */}
+    <Box
+      sx={{
+        display: "flex",
+        bgcolor: darkMode ? "#121212" : "#fff",
+        minHeight: "100vh",
+      }}
+    >
+      <ToastContainer />
       {!isMobile && (
         <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>
           <Sidebar includeProfileAndNotifications={true} />
         </Box>
       )}
-
       {isMobile && (
         <Drawer
           variant="temporary"
@@ -58,18 +105,11 @@ export default function FollowPage() {
           onClose={() => setMobileOpen(false)}
           ModalProps={{ keepMounted: true }}
           sx={{
-            display: "block",
-            zIndex: 1401,
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: SIDEBAR_WIDTH,
               bgcolor: darkMode ? "#121212" : "#f9f9f9",
               color: darkMode ? "#fff" : "#000",
-              height: "100vh",
-              position: "fixed",
-              top: 0,
-              left: 0,
-              zIndex: 1401,
             },
           }}
         >
@@ -77,7 +117,6 @@ export default function FollowPage() {
         </Drawer>
       )}
 
-      {/* Main Content */}
       <Box
         component="main"
         sx={{
@@ -89,45 +128,11 @@ export default function FollowPage() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          background: darkMode ? "#1e1e1e" : "linear-gradient(135deg, #fdfbfb, #ebedee)",
+          background: darkMode
+            ? "#1e1e1e"
+            : "linear-gradient(145deg, #fdfbfb, #ebedee)",
         }}
       >
-        {/* AppBar */}
-        {isMobile && (
-          <AppBar
-            position="sticky"
-            sx={{
-              bgcolor: darkMode ? "#1e1e1e" : "#f5f5f5",
-              boxShadow: "none",
-              height: "56px",
-              zIndex: 1100,
-            }}
-          >
-            <Toolbar
-              sx={{
-                minHeight: "56px !important",
-                px: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                onClick={() => setMobileOpen(!mobileOpen)}
-                sx={{ p: 0 }}
-              >
-                <MenuIcon sx={{ color: darkMode ? "#fff" : "#000", fontSize: 24 }} />
-              </IconButton>
-              <Typography variant="h6" sx={{ color: darkMode ? "#fff" : "#000", fontWeight: "bold" }}>
-                قائمة المتابعين
-              </Typography>
-            </Toolbar>
-          </AppBar>
-        )}
-
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -138,56 +143,99 @@ export default function FollowPage() {
             fontWeight="bold"
             mb={5}
             sx={{
-              background: "linear-gradient(to right, #ff758c, #ff7eb3)",
+              background: "linear-gradient(to right, #5f2c82, #49a09d)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               textShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
               fontSize: { xs: "28px", sm: "36px" },
+              textAlign: "center",
             }}
           >
-            قائمة المتابعين الخاصة بك
+            من تتابعهم حاليًا
           </Typography>
         </motion.div>
 
         <Box sx={{ display: "grid", gap: 3, maxWidth: 800, width: "100%" }}>
-          {followingList.map((user, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              style={{
-                borderRadius: "16px",
-                background: darkMode ? "#2c2c2c" : "#fff",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-              }}
-            >
-              <Paper elevation={0} sx={{ p: 3, display: "flex", alignItems: "center", background: "transparent", borderRadius: "16px" }}>
-                <Avatar src={user.profile_picture} sx={{ width: 64, height: 64, mr: 2, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
-                <Box flexGrow={1}>
-                  <Typography fontWeight="bold" fontSize={18}>{user.username}</Typography>
-                  <Typography variant="body2" sx={{ color: darkMode ? "#aaa" : "#666" }}>{user.bio}</Typography>
-                </Box>
-                <Button
-                  variant="contained"
+          {following.length === 0 ? (
+            <Typography color="text.secondary" textAlign="center">
+              لا تتابع أي شخص حاليًا.
+            </Typography>
+          ) : (
+            following.map((user, index) => (
+              <motion.div
+                key={user.username}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                style={{
+                  borderRadius: "16px",
+                  background: darkMode
+                    ? "linear-gradient(to right, #232526, #414345)"
+                    : "linear-gradient(to right, #fdfbfb, #ebedee)",
+                  boxShadow: darkMode
+                    ? "0 4px 16px rgba(0,0,0,0.4)"
+                    : "0 4px 16px rgba(0,0,0,0.08)",
+                }}
+              >
+                <Paper
+                  elevation={0}
                   sx={{
-                    borderRadius: 3,
-                    background: "linear-gradient(to right, #ec008c, #fc6767)",
-                    color: "#fff",
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    '&:hover': {
-                      background: "linear-gradient(to right, #fc6767, #ec008c)",
-                    },
+                    p: 3,
+                    display: "flex",
+                    alignItems: "center",
+                    background: "transparent",
+                    borderRadius: "16px",
                   }}
                 >
-                  إلغاء المتابعة
-                </Button>
-              </Paper>
-            </motion.div>
-          ))}
+                  <Avatar
+                    src={
+                      user.profile_picture || "https://via.placeholder.com/100"
+                    }
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      mr: 2,
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <Box flexGrow={1}>
+                    <Typography fontWeight="bold" fontSize={18}>
+                      {user.username}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: darkMode ? "#ccc" : "#666" }}
+                    >
+                      {user.bio || "لا توجد نبذة تعريفية."}
+                    </Typography>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    disabled={loadingUnfollow === user.username}
+                    onClick={() => handleUnfollow(user.username)}
+                    sx={{
+                      borderRadius: 3,
+                      background:
+                        "linear-gradient(to right,rgb(87, 87, 87),rgb(230, 230, 230))",
+                      color: "#fff",
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        background:
+                          "linear-gradient(to right, #ff4b2b, #ff416c)",
+                      },
+                    }}
+                  >
+                    {loadingUnfollow === user.username
+                      ? "جاري الإلغاء..."
+                      : "إلغاء المتابعة"}
+                  </Button>
+                </Paper>
+              </motion.div>
+            ))
+          )}
         </Box>
       </Box>
     </Box>

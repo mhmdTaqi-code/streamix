@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -7,12 +7,16 @@ import {
   CardMedia,
   CardContent,
   Avatar,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
-
-
+import axios from "axios";
 
 const recommended = [
   {
@@ -40,6 +44,38 @@ const recommended = [
 export default function RecommendedVideos() {
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
+  const handleMenuOpen = (event, video) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedVideo(video);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedVideo(null);
+  };
+
+  const handleAddToPlaylist = async () => {
+    if (!selectedVideo) return;
+    try {
+      await axios.post(
+        "https://dev1hunter.pythonanywhere.com/modle/live/api/playlists/1/add/",
+        {
+          title: selectedVideo.title,
+          image: selectedVideo.image,
+          streamer: selectedVideo.streamer,
+        }
+      );
+      alert("تمت الإضافة إلى قائمة التشغيل ✅");
+    } catch (error) {
+      console.error("فشل في الإضافة:", error);
+      alert("حدث خطأ أثناء الإضافة ❌");
+    } finally {
+      handleMenuClose();
+    }
+  };
 
   return (
     <Box sx={{ px: 2, mb: 4 }}>
@@ -67,8 +103,21 @@ export default function RecommendedVideos() {
                     boxShadow: darkMode
                       ? "0 8px 20px rgba(255,255,255,0.05)"
                       : "0 8px 20px rgba(0,0,0,0.1)",
+                    position: "relative",
                   }}
                 >
+                  <IconButton
+                    onClick={(e) => handleMenuOpen(e, video)}
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      color: darkMode ? "#fff" : "#000",
+                    }}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+
                   <CardMedia
                     component="img"
                     height="140"
@@ -95,6 +144,14 @@ export default function RecommendedVideos() {
           </Grid>
         ))}
       </Grid>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleAddToPlaylist}>أضف إلى قائمة التشغيل</MenuItem>
+      </Menu>
     </Box>
   );
 }

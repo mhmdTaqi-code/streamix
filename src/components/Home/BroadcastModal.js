@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../Api/axiosInstance";
 
 export default function BroadcastModal({ open, onClose }) {
   const [title, setTitle] = useState("");
@@ -26,7 +26,7 @@ export default function BroadcastModal({ open, onClose }) {
 
   // تحميل الفئات من API
   useEffect(() => {
-    axios
+    axiosInstance
       .get("https://dev1hunter.pythonanywhere.com/live/api/categories/")
       .then((res) => {
         const unique = Array.from(
@@ -57,7 +57,7 @@ export default function BroadcastModal({ open, onClose }) {
     formData.append("category", category); // ID الفئة
     formData.append("thumbnail", thumbnail);
 
-    axios
+    axiosInstance
       .post(
         "https://dev1hunter.pythonanywhere.com/live/api/streams/",
         formData,

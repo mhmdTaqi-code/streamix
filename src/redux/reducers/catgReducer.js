@@ -1,8 +1,9 @@
-import { GetALLCatg } from "../type";
+import { GetALLCatg, GetErr } from "../type";
 
 const init = {
   catg: [],
-  isLoding: true,
+  isLoading: true, // ✅ تصحيح الاسم
+  error: null,
 };
 
 const CatgReducer = (state = init, action) => {
@@ -11,7 +12,14 @@ const CatgReducer = (state = init, action) => {
       return {
         ...state,
         catg: action.payload,
-        isLoding: false,
+        isLoading: false,
+        error: null,
+      };
+    case GetErr:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
       };
     default:
       return state;

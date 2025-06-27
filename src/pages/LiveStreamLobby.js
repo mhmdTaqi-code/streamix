@@ -31,7 +31,7 @@ export default function LiveStreamPage() {
         </Typography>
         <Button
           variant="contained"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
           startIcon={<ArrowBackIcon />}
         >
           العودة للرئيسية

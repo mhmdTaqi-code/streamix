@@ -19,8 +19,9 @@ import Sidebar from "../components/Home/Sidebar";
 import Header from "../components/Home/Header";
 import { useSelector } from "react-redux";
 import { SIDEBAR_WIDTH } from "../redux/type";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import axiosInstance from "../Api/axiosInstance";
+import { motion } from "framer-motion";
 
 function useQuery() {
   const { search } = useLocation();
@@ -35,18 +36,28 @@ export default function SearchResultsPage() {
 
   const query = useQuery().get("q") || "";
   const [results, setResults] = useState([]);
+  const [streams, setStreams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!query) return;
     setLoading(true);
-    axios
-      .get(
-        `https://dev1hunter.pythonanywhere.com/live/api/videos/?search=${query}`
-      )
-      .then((res) => {
-        setResults(res.data);
+    setError(null);
+
+    const videoRequest = axiosInstance.get(
+      `https://dev1hunter.pythonanywhere.com/live/api/videos/?search=${query}`
+    );
+    const streamRequest = axiosInstance.get(
+      `https://dev1hunter.pythonanywhere.com/live/api/streams/?search=${query}`
+    );
+
+    Promise.all([videoRequest, streamRequest])
+      .then(([videoRes, streamRes]) => {
+        setResults(videoRes.data);
+        setStreams(streamRes.data);
         setLoading(false);
       })
       .catch(() => {
@@ -54,6 +65,9 @@ export default function SearchResultsPage() {
         setLoading(false);
       });
   }, [query]);
+
+  const fallbackImage =
+    "https://via.placeholder.com/320x180/000000/FFFFFF?text=No+Image";
 
   return (
     <Box
@@ -101,12 +115,7 @@ export default function SearchResultsPage() {
 
       <Box
         component="main"
-        sx={{
-          flexGrow: 1,
-          width: "100%",
-          height: "100vh",
-          overflowY: "auto",
-        }}
+        sx={{ flexGrow: 1, width: "100%", height: "100vh", overflowY: "auto" }}
       >
         <AppBar
           position="sticky"
@@ -154,39 +163,141 @@ export default function SearchResultsPage() {
           {loading && <Typography>جارٍ التحميل...</Typography>}
           {error && <Typography color="error">{error}</Typography>}
 
-          <Grid container spacing={2}>
-            {results.map((video) => (
-              <Grid item xs={12} sm={6} md={4} key={video.id}>
-                <Card
-                  sx={{
-                    bgcolor: darkMode ? "#1e1e1e" : "#fafafa",
-                    color: darkMode ? "#fff" : "#000",
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    height: "100%",
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="160"
-                    image={video.thumbnail}
-                    alt={video.title}
-                  />
-                  <CardContent>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      {video.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ mt: 0.5, color: darkMode ? "#ccc" : "#444" }}
+          {/* الفيديوهات */}
+          {results.length > 0 && (
+            <>
+              <Typography
+                variant="h6"
+                sx={{ mb: 2, color: darkMode ? "#fff" : "#000" }}
+              >
+                الفيديوهات:
+              </Typography>
+              <Grid container spacing={2}>
+                {results.map((video) => (
+                  <Grid item xs={12} sm={6} md={4} key={video.id}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}
                     >
-                      {video.uploader || "Unknown Uploader"}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                      <Card
+                        onClick={() => navigate(`/live/${video.youtube_id}`)}
+                        sx={{
+                          bgcolor: darkMode ? "#1e1e1e" : "#fafafa",
+                          color: darkMode ? "#fff" : "#000",
+                          borderRadius: 2,
+                          cursor: "pointer",
+                          height: "100%",
+                          transition:
+                            "box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out",
+                          "&:hover": {
+                            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)",
+                            transform: "translateY(-4px)",
+                          },
+                        }}
+                      >
+                        <CardMedia
+                          component="img"
+                          height="160"
+                          image={video.thumbnail || fallbackImage}
+                          alt={video.title}
+                        />
+                        <CardContent>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            {video.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ mt: 0.5, color: darkMode ? "#ccc" : "#444" }}
+                          >
+                            {video.uploader || "غير معروف"}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              mt: 1,
+                              display: "block",
+                              color: darkMode ? "#aaa" : "#666",
+                            }}
+                          >
+                            التصنيف: {video.category_name || "غير محدد"}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
+            </>
+          )}
+
+          {/* البثوث */}
+          {streams.length > 0 && (
+            <>
+              <Typography
+                variant="h6"
+                sx={{ mt: 5, mb: 2, color: darkMode ? "#fff" : "#000" }}
+              >
+                البثوث المباشرة:
+              </Typography>
+              <Grid container spacing={2}>
+                {streams.map((stream) => (
+                  <Grid item xs={12} sm={6} md={4} key={stream.id}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Card
+                        onClick={() => navigate(`/live/${stream.youtube_id}`)}
+                        sx={{
+                          bgcolor: darkMode ? "#1e1e1e" : "#fafafa",
+                          color: darkMode ? "#fff" : "#000",
+                          borderRadius: 2,
+                          cursor: "pointer",
+                          height: "100%",
+                          transition:
+                            "box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out",
+                          "&:hover": {
+                            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)",
+                            transform: "translateY(-4px)",
+                          },
+                        }}
+                      >
+                        <CardMedia
+                          component="img"
+                          height="160"
+                          image={stream.thumbnail || fallbackImage}
+                          alt={stream.name}
+                        />
+                        <CardContent>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            {stream.name}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ mt: 0.5, color: darkMode ? "#ccc" : "#444" }}
+                          >
+                            {stream.title || "لا يوجد عنوان"}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              mt: 1,
+                              display: "block",
+                              color: darkMode ? "#aaa" : "#666",
+                            }}
+                          >
+                            التصنيف: {stream.category_name || "غير محدد"}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          )}
         </Container>
       </Box>
     </Box>

@@ -1,7 +1,6 @@
-import axios from "axios"
+import axiosInstance from "./axiosInstance";
 
-
-
- const Baseurl = axios.create({baseURL:"https://dev1hunter.pythonanywhere.com/"})
- export default Baseurl
- 
+const Baseurl = axiosInstance.create({
+  baseURL: "https://dev1hunter.pythonanywhere.com/",
+});
+export default Baseurl;

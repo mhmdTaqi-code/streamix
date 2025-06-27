@@ -39,7 +39,7 @@ import { motion } from "framer-motion";
 const menuItems = [
   { icon: <Home />, text: "Home", link: "/home" },
   { icon: <Whatshot />, text: "Trending", link: "/TrendingPage" },
-  { icon: <Subscriptions />, text: "Following", link: "/profiles" },
+  { icon: <Subscriptions />, text: "Following", link: "/FollowPage" },
   { icon: <VideoLibrary />, text: "Your Videos", link: "/my-videos" },
   { icon: <VideoLibrary />, text: "Playlist", link: "/playlist" },
 ];
