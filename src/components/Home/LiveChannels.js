@@ -24,7 +24,7 @@ export default function LiveChannels() {
 
   useEffect(() => {
     axios
-      .get("https://devbaker123.pythonanywhere.com/live/api/videos/")
+      .get("https://dev1hunter.pythonanywhere.com/live/api/streams/")
       .then((response) => {
         setChannels(response.data);
         setLoading(false);

@@ -11,6 +11,9 @@ import {
   Avatar,
   IconButton,
   Button,
+  Tooltip,
+  Fade,
+  Switch,
 } from "@mui/material";
 import {
   Home,
@@ -22,6 +25,8 @@ import {
   AccountCircle,
   Logout,
   Login,
+  Brightness4,
+  Brightness7,
 } from "@mui/icons-material";
 import logo from "../../assets/1.png";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +34,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../../redux/reducers/themeReducer";
 import { SIDEBAR_WIDTH } from "../../redux/type";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
 
 const menuItems = [
   { icon: <Home />, text: "Home", link: "/home" },
@@ -87,6 +93,10 @@ export default function Sidebar() {
 
   return (
     <Box
+      component={motion.div}
+      initial={{ x: -200, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
       sx={{
         width: SIDEBAR_WIDTH,
         bgcolor: darkMode ? "#1e1e1e" : "#fff",
@@ -114,10 +124,9 @@ export default function Sidebar() {
         gutterBottom
         sx={{
           fontWeight: "bold",
-          alignItems: "center",
           display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-around",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
         STREAMIX <img style={{ width: "50px" }} src={logo} alt="logo" />
@@ -139,6 +148,24 @@ export default function Sidebar() {
           <AccountCircle />
         </IconButton>
       </Box>
+
+      <Tooltip title={darkMode ? "الوضع الفاتح" : "الوضع الداكن"} arrow placement="top" TransitionComponent={Fade}>
+        <Button
+          fullWidth
+          startIcon={darkMode ? <Brightness7 /> : <Brightness4 />}
+          onClick={() => dispatch(toggleTheme())}
+          sx={{
+            mb: 2,
+            bgcolor: darkMode ? "#333" : "#1976d2",
+            color: "#fff",
+            "&:hover": {
+              bgcolor: darkMode ? "#444" : "#1565c0",
+            },
+          }}
+        >
+          التبديل إلى {darkMode ? "الوضع الفاتح" : "الوضع الداكن"}
+        </Button>
+      </Tooltip>
 
       {username === "Guest" ? (
         <Button
@@ -163,30 +190,14 @@ export default function Sidebar() {
         </Button>
       )}
 
-      <Button
-        variant="contained"
-        fullWidth
-        onClick={() => dispatch(toggleTheme())}
-        sx={{
-          mb: 2,
-          bgcolor: darkMode ? "#333" : "#1976d2",
-          color: "#fff",
-          "&:hover": {
-            bgcolor: darkMode ? "#444" : "#1565c0",
-          },
-        }}
-      >
-        التبديل إلى {darkMode ? "الوضع الفاتح" : "الوضع الليلي"}
-      </Button>
-
-      <List style={{cursor: 'pointer'}} >
+      <List style={{ cursor: 'pointer' }}>
         {menuItems.map((item, index) => (
           <ListItem
             button
             key={index}
             sx={{ borderRadius: 2 }}
             onClick={() => {
-              if (item.text === "Playlist" || item.text === "Your Videos" || item.text === "Following") {
+              if (["Playlist", "Your Videos", "Following"].includes(item.text)) {
                 handleProtectedNavigation(item.link);
               } else {
                 navigate(item.link);
@@ -203,10 +214,7 @@ export default function Sidebar() {
 
       <Divider sx={{ my: 2, bgcolor: darkMode ? "#444" : "#e0e0e0" }} />
 
-      <Typography
-        variant="subtitle2"
-        sx={{ color: darkMode ? "#aaa" : "#666", mb: 1 }}
-      >
+      <Typography variant="subtitle2" sx={{ color: darkMode ? "#aaa" : "#666", mb: 1 }}>
         Following
       </Typography>
 
@@ -230,11 +238,7 @@ export default function Sidebar() {
                 />
               </ListItemIcon>
               <ListItemText
-                primary={
-                  <Typography sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}>
-                    {user.username}
-                  </Typography>
-                }
+                primary={<Typography sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}>{user.username}</Typography>}
               />
             </ListItem>
           ))}
