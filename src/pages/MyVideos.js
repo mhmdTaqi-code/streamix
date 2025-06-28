@@ -21,8 +21,8 @@ import Sidebar from "../components/Home/Sidebar";
 import { motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
 import { SIDEBAR_WIDTH } from "../redux/type";
+import axios from "axios";
 import axiosInstance from "../Api/axiosInstance";
-import { useNavigate } from "react-router-dom";
 
 export default function MyVideos() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -32,7 +32,6 @@ export default function MyVideos() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -43,6 +42,7 @@ export default function MyVideos() {
       return;
     }
 
+    // Fetch user profile image
     const fetchProfile = async () => {
       try {
         const res = await axiosInstance.get(`/profile/${username}/`, {
@@ -52,15 +52,16 @@ export default function MyVideos() {
         });
         const imageUrl =
           res.data.profile_picture || res.data.user.profile_picture;
-        setUserImage(imageUrl);
+        setUserImage(imageUrl); // could be null
       } catch (err) {
         console.error("Failed to fetch profile image", err);
       }
     };
 
+    // Fetch user videos
     const fetchVideos = async () => {
       try {
-        const response = await axiosInstance.get("/live/api/videos", {
+        const response = await axios.get("/live/api/videos", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -228,9 +229,7 @@ export default function MyVideos() {
                         style={{ width: "100%" }}
                       >
                         <Card
-                          onClick={() => navigate(`/video/${video.id}`)}
                           sx={{
-                            cursor: "pointer",
                             borderRadius: 3,
                             boxShadow: 4,
                             bgcolor: darkMode ? "#2c2c2c" : "#fff",

@@ -3,17 +3,20 @@ import {
   Box,
   Typography,
   Avatar,
-  Button,
   Card,
   CardContent,
   Divider,
   Grid,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Button,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import FullScreenLoader from "../components/Loading";
 import axiosInstance from "../Api/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import DarkModeToggle from "../components/DarkModeToggle"; // ← استيراد الزر الجديد
+import DarkModeToggle from "../components/DarkModeToggle";
 
 export default function Profile() {
   const [darkMode, setDarkMode] = useState(
@@ -65,11 +68,10 @@ export default function Profile() {
     >
       {isLoading && <FullScreenLoader darkMode={darkMode} />}
 
-      {/* 🔘 زر التبديل في الأعلى */}
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
 
-      <Typography variant="h4" gutterBottom>
-        Profile
+      <Typography variant="h4" gutterBottom fontWeight="bold">
+        الملف الشخصي
       </Typography>
 
       {error && (
@@ -77,16 +79,6 @@ export default function Profile() {
           <Typography variant="body1" color="error" sx={{ mb: 2 }}>
             {error}
           </Typography>
-          <Button
-            variant="outlined"
-            onClick={() => navigate("/home")}
-            sx={{
-              color: darkMode ? "#fff" : "#000",
-              borderColor: darkMode ? "#555" : "#ccc",
-            }}
-          >
-            Back to Home
-          </Button>
         </Box>
       )}
 
@@ -105,46 +97,103 @@ export default function Profile() {
             <Grid container spacing={3}>
               <Grid item xs={12} sm={4} display="flex" justifyContent="center">
                 <Avatar
-                  src={user.avatar || "https://i.pravatar.cc/150?img=32"}
-                  alt={user.name}
+                  src={
+                    user.user.profile_picture ||
+                    "https://i.pravatar.cc/150?img=32"
+                  }
+                  alt={user.user.username}
                   sx={{ width: 120, height: 120 }}
                 />
               </Grid>
               <Grid item xs={12} sm={8}>
-                <Typography variant="h5" fontWeight="bold">
-                  {user.name || user.username}
-                </Typography>
-                <Typography variant="body1" sx={{ mt: 1 }}>
-                  {user.email}
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 2, color: "gray" }}>
-                  {user.bio || "No bio provided."}
-                </Typography>
-                <Typography variant="caption" sx={{ display: "block", mt: 2 }}>
-                  Joined:{" "}
-                  {user.created_at
-                    ? new Date(user.created_at).toLocaleDateString()
-                    : "Unknown"}
-                </Typography>
+                <Typography variant="h5" fontWeight="bold"></Typography>
 
-                <Button
-                  variant="outlined"
-                  startIcon={<EditIcon />}
+                <Typography
+                  variant="subtitle1"
                   sx={{
-                    mt: 3,
-                    color: darkMode ? "#fff" : "#000",
-                    borderColor: darkMode ? "#555" : "#ccc",
+                    mt: 1,
+                    color: darkMode ? "#aaa" : "#888",
+                    fontStyle: "italic",
                   }}
                 >
-                  Edit Profile
-                </Button>
+                  @{user.user.username}
+                </Typography>
+
+                <Typography
+                  variant="body1"
+                  sx={{ mt: 2, color: darkMode ? "#ccc" : "#444" }}
+                >
+                  {user.bio || "لا توجد نبذة."}
+                </Typography>
+
+                <Typography
+                  variant="body1"
+                  sx={{ mt: 2, color: darkMode ? "#ccc" : "#666" }}
+                >
+                  المتابعون: {user.followers_count}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ color: darkMode ? "#ccc" : "#666" }}
+                >
+                  المتابَعون: {user.following_count}
+                </Typography>
               </Grid>
             </Grid>
+
+            {user.followers?.length > 0 && (
+              <>
+                <Divider sx={{ my: 3 }} />
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 2, color: darkMode ? "#fff" : "#000" }}
+                >
+                  المتابعون
+                </Typography>
+                <List>
+                  {user.followers.map((follower, index) => (
+                    <ListItem key={index}>
+                      <ListItemAvatar>
+                        <Avatar
+                          src={
+                            follower.profile_picture ||
+                            "https://i.pravatar.cc/150?img=64"
+                          }
+                        />
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={follower.username}
+                        primaryTypographyProps={{
+                          sx: { color: darkMode ? "#eee" : "#111" },
+                        }}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+            )}
+
+            {/* زر الرجوع إلى الصفحة الرئيسية */}
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h6">Account Settings</Typography>
-            <Typography variant="body2" sx={{ color: "gray", mt: 1 }}>
-              Settings and preferences can be added here later.
-            </Typography>
+            <Box textAlign="center" mt={2}>
+              <Button
+                variant="contained"
+                onClick={() => navigate("/home")}
+                sx={{
+                  bgcolor: darkMode ? "#333" : "#1976d2",
+                  color: "#fff",
+                  "&:hover": {
+                    bgcolor: darkMode ? "#444" : "#1565c0",
+                  },
+                  px: 4,
+                  py: 1,
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                }}
+              >
+                الرجوع إلى الصفحة الرئيسية
+              </Button>
+            </Box>
           </CardContent>
         </Card>
       )}

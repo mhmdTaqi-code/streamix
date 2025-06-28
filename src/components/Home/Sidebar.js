@@ -302,15 +302,9 @@ export default function Sidebar() {
       <List>
         <ListItem button>
           <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
-            <Chat />
-          </ListItemIcon>
-          <ListItemText primary="Chat" />
-        </ListItem>
-        <ListItem button>
-          <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
             <Settings />
           </ListItemIcon>
-          <ListItemText primary="Settings" />
+          <ListItemText primary="zoom" />
         </ListItem>
       </List>
     </Box>
