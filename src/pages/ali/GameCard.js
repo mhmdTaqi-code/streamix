@@ -7,6 +7,7 @@ import {
   CardContent,
   useTheme,
   useMediaQuery,
+  Button,
 } from "@mui/material";
 import {
   SportsEsports,
@@ -14,116 +15,124 @@ import {
   Timeline,
   Psychology,
   Extension,
+  Home,
 } from "@mui/icons-material";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function GamingCenterEnglish() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("lg"));
 
   const games = [
     {
       id: 1,
       title: "Chess",
-      description:
-        "The classic game of kings. Test your strategic skills in this timeless masterpiece",
+      description: "The classic game of kings. Test your strategic skills in this timeless masterpiece",
       icon: <SportsEsports sx={{ fontSize: 40, color: "#fff" }} />,
+      link: "https://chess-production-0bf3.up.railway.app/chessgame/",
     },
     {
       id: 2,
       title: "Tic Tac Toe",
-      description:
-        "Simple and fun game for everyone. Get three marks in a row to win",
+      description: "Simple and fun game for everyone. Get three marks in a row to win",
       icon: <EmojiEvents sx={{ fontSize: 40, color: "#fff" }} />,
+      link: "https://abdullahhasanaen.github.io/xo_new/",
     },
     {
       id: 3,
-      title: "Snake Game",
-      description:
-        "The beloved classic game. Collect food and make your snake grow longer",
+      title: "Learning Game",
+      description: "The beloved classic game. Collect food and make your snake grow longer",
       icon: <Timeline sx={{ fontSize: 40, color: "#fff" }} />,
+      link: "https://abdullahhasanaen.github.io/learning_new/",
     },
     {
       id: 4,
-      title: "Memory Game",
-      description:
-        "Test your memory power. Find matching pairs in the fewest number of attempts",
+      title: "Pig Game",
+      description: "Test your memory power. Find matching pairs in the fewest number of attempts",
       icon: <Psychology sx={{ fontSize: 40, color: "#fff" }} />,
+      link: "https://abdullahhasanaen.github.io/pig_new/",
     },
     {
       id: 5,
-      title: "Puzzle Game",
-      description:
-        "Number arrangement challenge. Sort the numbers in the correct order",
+      title: "Pom Game",
+      description: "Number arrangement challenge. Sort the numbers in the correct order",
       icon: <Extension sx={{ fontSize: 40, color: "#fff" }} />,
+      link: "https://abdullahhasanaen.github.io/pom_new/",
     },
   ];
 
   const GameCard = ({ game }) => (
-    <Card
-      sx={{
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        backdropFilter: "blur(10px)",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
-        borderRadius: 3,
-        cursor: "pointer",
-        transition: "all 0.3s ease",
-        height: "100%",
-        "&:hover": {
-          transform: "translateY(-8px)",
-          backgroundColor: "rgba(255, 255, 255, 0.08)",
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
-        },
-      }}
+    <a
+      href={game.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ textDecoration: "none" }}
     >
-      <CardContent
+      <Card
         sx={{
-          p: 4,
-          textAlign: "left",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          backdropFilter: "blur(10px)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: 3,
+          cursor: "pointer",
+          transition: "all 0.3s ease",
           height: "100%",
-          display: "flex",
-          flexDirection: "column",
+          "&:hover": {
+            transform: "translateY(-8px)",
+            backgroundColor: "rgba(255, 255, 255, 0.08)",
+            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
+          },
         }}
       >
-        <Box
+        <CardContent
           sx={{
-            width: 80,
-            height: 80,
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-            borderRadius: 2,
+            p: 4,
+            textAlign: "left",
+            height: "100%",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            mb: 3,
+            flexDirection: "column",
           }}
         >
-          {game.icon}
-        </Box>
-        <Typography
-          variant="h5"
-          component="h3"
-          sx={{
-            color: "white",
-            fontWeight: 600,
-            mb: 2,
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          {game.title}
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            color: "rgba(255, 255, 255, 0.8)",
-            lineHeight: 1.6,
-            fontFamily: "'Inter', sans-serif",
-            flex: 1,
-          }}
-        >
-          {game.description}
-        </Typography>
-      </CardContent>
-    </Card>
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              borderRadius: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 3,
+            }}
+          >
+            {game.icon}
+          </Box>
+          <Typography
+            variant="h5"
+            component="h3"
+            sx={{
+              color: "white",
+              fontWeight: 600,
+              mb: 2,
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            {game.title}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "rgba(255, 255, 255, 0.8)",
+              lineHeight: 1.6,
+              fontFamily: "'Inter', sans-serif",
+              flex: 1,
+            }}
+          >
+            {game.description}
+          </Typography>
+        </CardContent>
+      </Card>
+    </a>
   );
 
   return (
@@ -158,13 +167,8 @@ export default function GamingCenterEnglish() {
           px: { xs: 2, sm: 3 },
         }}
       >
-        {/* Header Section */}
-        <Box
-          sx={{
-            textAlign: "center",
-            mb: { xs: 6, md: 8 },
-          }}
-        >
+        {/* Header */}
+        <Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
           <Box
             sx={{
               display: "flex",
@@ -212,11 +216,9 @@ export default function GamingCenterEnglish() {
               color: "rgba(255, 255, 255, 0.9)",
               mb: 2,
               fontFamily: "'Inter', sans-serif",
-              fontWeight: 400,
-            }}
+           }}
           >
-            Enjoy an amazing collection of classic games designed with
-            exceptional care
+            Enjoy an amazing collection of classic games designed with exceptional care
           </Typography>
           <Typography
             variant="body1"
@@ -231,7 +233,7 @@ export default function GamingCenterEnglish() {
           </Typography>
         </Box>
 
-        {/* Games Grid - Horizontal Layout */}
+        {/* Games Grid */}
         <Box
           sx={{
             display: "flex",
@@ -270,35 +272,33 @@ export default function GamingCenterEnglish() {
           ))}
         </Box>
 
-        {/* Decorative Elements */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: "10%",
-            left: "5%",
-            width: 100,
-            height: 100,
-            borderRadius: "50%",
-            background: "rgba(255, 255, 255, 0.05)",
-            animation: "float 6s ease-in-out infinite",
-            "@keyframes float": {
-              "0%, 100%": { transform: "translateY(0px)" },
-              "50%": { transform: "translateY(-20px)" },
-            },
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: "15%",
-            right: "8%",
-            width: 60,
-            height: 60,
-            borderRadius: "50%",
-            background: "rgba(255, 255, 255, 0.03)",
-            animation: "float 4s ease-in-out infinite reverse",
-          }}
-        />
+        {/* Back Button */}
+        <Box sx={{ textAlign: "center", mt: 6 }}>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<Home />}
+            component={RouterLink}
+            to="/home"
+            sx={{
+              background: "linear-gradient(to right, #64b5f6, #42a5f5)",
+              color: "#fff",
+              fontWeight: "bold",
+              px: 4,
+              py: 1.5,
+              borderRadius: 4,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+              textTransform: "none",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: "linear-gradient(to right, #42a5f5, #1e88e5)",
+                boxShadow: "0 6px 30px rgba(0,0,0,0.4)",
+              },
+            }}
+          >
+            Back to Home
+          </Button>
+        </Box>
       </Container>
     </Box>
   );

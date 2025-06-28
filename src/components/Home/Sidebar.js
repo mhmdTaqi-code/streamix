@@ -42,7 +42,7 @@ const menuItems = [
   { icon: <Whatshot />, text: "Trending", link: "/TrendingPage" },
   { icon: <Subscriptions />, text: "Following", link: "/FollowPage" },
   { icon: <VideoLibrary />, text: "Your Videos", link: "/my-videos" },
-  { icon: <VideoLibrary />, text: "Playlist", link: "/playlist" },
+  { icon: <VideoLibrary />, text: "Game Center", link: "/game" },
 ];
 
 export default function Sidebar() {

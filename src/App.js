@@ -1,12 +1,8 @@
 // App.jsx
 import React, { useMemo, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+
 import Login from "./pages/login";
 import Register from "./pages/Register";
 import Homepage from "./pages/Home";
@@ -20,27 +16,27 @@ import LiveStreamPage from "./pages/LiveStreamPage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import CategoryVideos from "./pages/CategoryVideos";
 import Profile from "./pages/Profile";
+import GameCentr from "./pages/GameCentr";  // <-- استيراد مكون الألعاب
+
 
 function App() {
   const [mode, setMode] = useState("light");
 
-  const theme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode,
-          ...(mode === "dark"
-            ? {
-                background: { default: "#121212", paper: "#1d1d1d" },
-                text: { primary: "#fff" },
-              }
-            : {
-                background: { default: "#f9f9f9", paper: "#fff" },
-                text: { primary: "#000" },
-              }),
-        },
-      }),
-    [mode]
+  const theme = useMemo(() =>
+    createTheme({
+      palette: {
+        mode,
+        ...(mode === "dark"
+          ? {
+              background: { default: "#121212", paper: "#1d1d1d" },
+              text: { primary: "#fff" },
+            }
+          : {
+              background: { default: "#f9f9f9", paper: "#fff" },
+              text: { primary: "#000" },
+            }),
+      },
+    }), [mode]
   );
 
   return (
@@ -51,16 +47,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/home"
-            element={
-              <Homepage
-                toggleTheme={() =>
-                  setMode((prev) => (prev === "light" ? "dark" : "light"))
-                }
-              />
-            }
-          />
+          <Route path="/home" element={<Homepage toggleTheme={() => setMode(prev => (prev === "light" ? "dark" : "light"))} />} />
           <Route path="/streamix" element={<Homepage />} />
           <Route path="/my-videos" element={<MyVideos />} />
           <Route path="/live" element={<LiveStreamLobby />} />
@@ -72,6 +59,7 @@ function App() {
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/category/:id" element={<CategoryVideos />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/game" element={<GameCentr />} />  {/* استخدم المكون هنا */}
         </Routes>
       </Router>
     </ThemeProvider>
