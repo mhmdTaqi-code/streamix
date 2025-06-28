@@ -1,3 +1,4 @@
+// File: src/pages/Homepage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -20,23 +21,29 @@ import LiveChannels from "../components/Home/LiveChannels";
 import Categories from "../components/Home/Categories";
 import RecommendedVideos from "../components/Home/RecommendedVideos";
 import BroadcastModal from "../components/Home/BroadcastModal";
+import SelectTypeModal from "../components/Home/SelectTypeModal";
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import { SIDEBAR_WIDTH } from "../redux/type";
 import "react-toastify/dist/ReactToastify.css";
+import UploadVideoModal from "../components/Home/UploadVideoModal";
 
 export default function Homepage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:768px)");
-  const [modalOpen, setModalOpen] = useState(false);
+  const [typeModalOpen, setTypeModalOpen] = useState(false);
+  const [broadcastModalOpen, setBroadcastModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
 
+  // ✅ التحقق من تسجيل الدخول وعدم كونه ضيف
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!token);
+    const isGuest = localStorage.getItem("isGuest");
+    setIsLoggedIn(!!token && isGuest !== "true");
   }, []);
 
   return (
@@ -52,12 +59,11 @@ export default function Homepage() {
       <CssBaseline />
       <ToastContainer position="top-right" />
 
-    {!isMobile && (
-  <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>
-    <Sidebar includeProfileAndNotifications={true} />
-  </Box>
-)}
-
+      {!isMobile && (
+        <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>
+          <Sidebar includeProfileAndNotifications={true} />
+        </Box>
+      )}
 
       {isMobile && (
         <Drawer
@@ -119,7 +125,9 @@ export default function Homepage() {
               onClick={() => setMobileOpen(!mobileOpen)}
               sx={{ p: 0, display: { xs: "inline-flex", md: "none" } }}
             >
-              <MenuIcon sx={{ color: darkMode ? "#fff" : "#000", fontSize: 24 }} />
+              <MenuIcon
+                sx={{ color: darkMode ? "#fff" : "#000", fontSize: 24 }}
+              />
             </IconButton>
             <Box sx={{ flexGrow: 1, px: 1 }}>
               <Header searchOnly={isMobile} />
@@ -143,10 +151,11 @@ export default function Homepage() {
           </Grid>
         </Container>
 
+        {/* ✅ الزر يظهر فقط إذا كان المستخدم مسجل الدخول وليس ضيفًا */}
         {isLoggedIn && (
           <Fab
             color="primary"
-            onClick={() => setModalOpen(true)}
+            onClick={() => setTypeModalOpen(true)}
             sx={{
               position: "fixed",
               bottom: 20,
@@ -158,7 +167,28 @@ export default function Homepage() {
           </Fab>
         )}
 
-        <BroadcastModal open={modalOpen} onClose={() => setModalOpen(false)} />
+        <SelectTypeModal
+          open={typeModalOpen}
+          onClose={() => setTypeModalOpen(false)}
+          onSelect={(type) => {
+            setTypeModalOpen(false);
+            if (type === "live") {
+              setBroadcastModalOpen(true);
+            } else if (type === "video") {
+              setUploadModalOpen(true);
+            }
+          }}
+        />
+
+        <BroadcastModal
+          open={broadcastModalOpen}
+          onClose={() => setBroadcastModalOpen(false)}
+        />
+
+        <UploadVideoModal
+          open={uploadModalOpen}
+          onClose={() => setUploadModalOpen(false)}
+        />
       </Box>
     </Box>
   );

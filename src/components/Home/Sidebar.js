@@ -1,3 +1,4 @@
+// Sidebar.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -46,6 +47,7 @@ const menuItems = [
 
 export default function Sidebar() {
   const [username, setUsername] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
   const [following, setFollowing] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -60,12 +62,24 @@ export default function Sidebar() {
 
     if (storedUsername) {
       setUsername(storedUsername);
+
       axios
         .get(
           `https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/following/`
         )
         .then((res) => setFollowing(res.data))
         .catch((err) => console.error("Error fetching following:", err));
+
+      axios
+        .get(`https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/`)
+        .then((res) => {
+          const pic = res.data.profile_picture;
+          const fullUrl = pic?.startsWith("http")
+            ? pic
+            : `https://dev1hunter.pythonanywhere.com${pic}`;
+          setProfilePicture(fullUrl);
+        })
+        .catch((err) => console.error("Error fetching profile picture:", err));
     } else if (guest === "true") {
       setUsername("Guest");
     } else {
@@ -87,7 +101,7 @@ export default function Sidebar() {
 
   const handleProtectedNavigation = (link) => {
     if (isGuest) {
-      toast.info("يجب تسجيل الدخول أولاً.");
+      toast.info("You must log in first.");
     } else {
       navigate(link);
     }
@@ -141,38 +155,50 @@ export default function Sidebar() {
           alignItems: "center",
           gap: 1,
           mb: 2,
+          cursor: username !== "Guest" ? "pointer" : "default",
+        }}
+        onClick={() => {
+          if (username !== "Guest") navigate("/profile");
         }}
       >
+        <Avatar
+          src={profilePicture}
+          alt={username}
+          sx={{ width: 32, height: 32 }}
+        />
         <Typography variant="body1" fontWeight="bold">
           {username}
         </Typography>
-        <IconButton sx={{ color: darkMode ? "#fff" : "#000" }}>
-          <AccountCircle />
-        </IconButton>
       </Box>
 
-      <Tooltip
-        title={darkMode ? "الوضع الفاتح" : "الوضع الداكن"}
-        arrow
-        placement="top"
-        TransitionComponent={Fade}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 2,
+          px: 1,
+          py: 1,
+          borderRadius: 2,
+          bgcolor: darkMode ? "#2c2c2c" : "#f0f0f0",
+        }}
       >
-        <Button
-          fullWidth
-          startIcon={darkMode ? <Brightness7 /> : <Brightness4 />}
-          onClick={() => dispatch(toggleTheme())}
-          sx={{
-            mb: 2,
-            bgcolor: darkMode ? "#333" : "#1976d2",
-            color: "#fff",
-            "&:hover": {
-              bgcolor: darkMode ? "#444" : "#1565c0",
-            },
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {darkMode ? <Brightness4 /> : <Brightness7 />}
+          <Typography fontSize={14}>
+            {darkMode ? "Dark Mode" : "Light Mode"}
+          </Typography>
+        </Box>
+        <Switch
+          checked={darkMode}
+          onChange={() => {
+            const newMode = darkMode ? "light" : "dark";
+            localStorage.setItem("themeMode", newMode);
+            dispatch(toggleTheme());
           }}
-        >
-          التبديل إلى {darkMode ? "الوضع الفاتح" : "الوضع الداكن"}
-        </Button>
-      </Tooltip>
+          color="primary"
+        />
+      </Box>
 
       {username === "Guest" ? (
         <Button
@@ -186,7 +212,7 @@ export default function Sidebar() {
             borderColor: darkMode ? "#777" : "#ccc",
           }}
         >
-          تسجيل الدخول
+          Log In
         </Button>
       ) : (
         <Button
@@ -197,7 +223,7 @@ export default function Sidebar() {
           onClick={handleLogout}
           sx={{ mb: 2 }}
         >
-          تسجيل الخروج
+          Log Out
         </Button>
       )}
 
@@ -236,11 +262,11 @@ export default function Sidebar() {
 
       {isGuest ? (
         <Typography sx={{ color: darkMode ? "#999" : "#444", fontSize: 14 }}>
-          يجب تسجيل الدخول لعرض المتابعين.
+          Please log in to see followers.
         </Typography>
       ) : following.length === 0 ? (
         <Typography sx={{ color: darkMode ? "#999" : "#444", fontSize: 14 }}>
-          لا يوجد متابعين.
+          You are not following anyone.
         </Typography>
       ) : (
         <List>

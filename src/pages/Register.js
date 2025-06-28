@@ -43,7 +43,7 @@ export default function Register() {
   const handleSubmit = async () => {
     const success = await onSubmit();
     if (success) {
-      navigate("/home");
+      navigate("/login", { state: { justRegistered: true } });
     }
   };
 
@@ -56,7 +56,7 @@ export default function Register() {
         justifyContent: "center",
         position: "relative",
         overflow: "hidden",
-        bgcolor: darkMode ? "#0e0e0e" : "#f0f0f0", // خلفية عادية بدل VANTA
+        bgcolor: darkMode ? "#0e0e0e" : "#f0f0f0",
       }}
     >
       {loading && <FullScreenLoader />}
@@ -66,11 +66,12 @@ export default function Register() {
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        elevation={3}
+        elevation={6}
         sx={{
           p: 4,
-          maxWidth: 600,
+          maxWidth: 440,
           width: "100%",
+          textAlign: "center",
           borderRadius: 3,
           bgcolor: darkMode ? "#1a1a1a" : "#fff",
           boxShadow: darkMode
@@ -81,18 +82,8 @@ export default function Register() {
       >
         <ToastContainer position="top-center" />
 
-        <Box
-          textAlign="center"
-          mb={2}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Avatar
-            src={logo}
-            alt="Streamix Logo"
-            sx={{ width: 64, height: 64 }}
-          />
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Avatar src={logo} sx={{ width: 64, height: 64, mb: 1 }} />
           <Tooltip title={darkMode ? "الوضع الفاتح" : "الوضع الداكن"}>
             <IconButton onClick={() => dispatch(toggleTheme())}>
               {darkMode ? (
@@ -107,82 +98,121 @@ export default function Register() {
         <Typography
           variant="h5"
           fontWeight="bold"
-          textAlign="center"
-          color={darkMode ? "#f5f5f5" : "#000"}
+          mb={2}
+          sx={{ color: darkMode ? "#f5f5f5" : "#000" }}
         >
-          Join Streamix
+          Create your account
         </Typography>
 
-        <Grid container spacing={2} mt={2}>
-          <Grid item xs={12}>
-            <TextField
-              label="Full Name"
-              fullWidth
-              variant="outlined"
-              value={name}
-              onChange={onChangeName}
-              sx={inputStyles(darkMode)}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Email"
-              fullWidth
-              variant="outlined"
-              value={email}
-              onChange={onChangeEmail}
-              sx={inputStyles(darkMode)}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Password"
-              type="password"
-              fullWidth
-              variant="outlined"
-              value={password}
-              onChange={onChangePassword}
-              sx={inputStyles(darkMode)}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              onClick={handleSubmit}
-              variant="contained"
-              color="primary"
-              fullWidth
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Register"}
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography
-              variant="body2"
-              align="center"
-              color={darkMode ? "#ccc" : "#444"}
-            >
-              Already have an account?{" "}
-              <Link component={RouterLink} to="/login">
-                Login here
-              </Link>
-            </Typography>
-          </Grid>
-        </Grid>
+        <Box
+          component={motion.div}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <TextField
+            label="Full Name"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            value={name}
+            onChange={onChangeName}
+            sx={{
+              input: { color: darkMode ? "#fff" : "#000" },
+              label: { color: darkMode ? "#bbb" : "#000" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: darkMode ? "#888" : "#ccc",
+                },
+                "&:hover fieldset": {
+                  borderColor: darkMode ? "#aaa" : "#000",
+                },
+              },
+            }}
+          />
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            value={email}
+            onChange={onChangeEmail}
+            sx={{
+              input: { color: darkMode ? "#fff" : "#000" },
+              label: { color: darkMode ? "#bbb" : "#000" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: darkMode ? "#888" : "#ccc",
+                },
+                "&:hover fieldset": {
+                  borderColor: darkMode ? "#aaa" : "#000",
+                },
+              },
+            }}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            value={password}
+            onChange={onChangePassword}
+            sx={{
+              input: { color: darkMode ? "#fff" : "#000" },
+              label: { color: darkMode ? "#bbb" : "#000" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: darkMode ? "#888" : "#ccc",
+                },
+                "&:hover fieldset": {
+                  borderColor: darkMode ? "#aaa" : "#000",
+                },
+              },
+            }}
+          />
+
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Register"}
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            sx={{ mt: 2 }}
+            onClick={() => {
+              localStorage.removeItem("accessToken");
+              localStorage.removeItem("refreshToken");
+              localStorage.removeItem("username");
+              localStorage.setItem("isGuest", "true");
+              window.location.href = "/home";
+            }}
+          >
+            دخول كـ ضيف
+          </Button>
+
+          <Typography
+            variant="body2"
+            align="center"
+            mt={2}
+            sx={{ color: darkMode ? "#ccc" : "#444" }}
+          >
+            Already have an account?{" "}
+            <Link component={RouterLink} to="/login">
+              Login here
+            </Link>
+          </Typography>
+        </Box>
       </Paper>
     </Box>
   );
 }
-
-const inputStyles = (darkMode) => ({
-  input: { color: darkMode ? "#fff" : "#000" },
-  label: { color: darkMode ? "#bbb" : "#000" },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: darkMode ? "#888" : "#ccc",
-    },
-    "&:hover fieldset": {
-      borderColor: darkMode ? "#aaa" : "#000",
-    },
-  },
-});

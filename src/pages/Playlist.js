@@ -11,15 +11,14 @@ import {
   DialogContent,
   DialogActions,
   Fab,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
   Drawer,
   AppBar,
   Toolbar,
   IconButton,
   useMediaQuery,
+  Card,
+  CardMedia,
+  CardContent,
 } from "@mui/material";
 import { Add as AddIcon, Menu as MenuIcon } from "@mui/icons-material";
 import { useSelector } from "react-redux";
@@ -29,9 +28,22 @@ import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../components/Home/Sidebar";
 import { SIDEBAR_WIDTH } from "../redux/type";
 import axiosInstance from "../Api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const getToken = () => localStorage.getItem("accessToken");
 const getUsername = () => localStorage.getItem("username") || "Unknown";
+const getSavedPlaylists = () => {
+  try {
+    const data = localStorage.getItem("playlists");
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+
+const savePlaylistsToLocalStorage = (playlists) => {
+  localStorage.setItem("playlists", JSON.stringify(playlists));
+};
 
 const api = axiosInstance.create({
   baseURL: "https://dev1hunter.pythonanywhere.com/live/api/",
@@ -42,12 +54,17 @@ export default function PlaylistPage() {
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:768px)");
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const localData = getSavedPlaylists();
+    if (localData.length > 0) setPlaylists(localData);
     fetchPlaylists();
   }, []);
 
@@ -57,6 +74,7 @@ export default function PlaylistPage() {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       setPlaylists(response.data);
+      savePlaylistsToLocalStorage(response.data);
     } catch (error) {
       toast.error("فشل في جلب القوائم");
     }
@@ -72,7 +90,9 @@ export default function PlaylistPage() {
             headers: { Authorization: `Bearer ${getToken()}` },
           }
         );
-        setPlaylists((prev) => [...prev, response.data]);
+        const updated = [...playlists, response.data];
+        setPlaylists(updated);
+        savePlaylistsToLocalStorage(updated);
         setNewPlaylistName("");
         setDialogOpen(false);
         toast.success("تمت إضافة القائمة بنجاح");
@@ -93,28 +113,39 @@ export default function PlaylistPage() {
           headers: { Authorization: `Bearer ${getToken()}` },
         }
       );
-      setPlaylists(
-        playlists.map((playlist) =>
-          playlist.id === id
-            ? { ...playlist, name: response.data.name }
-            : playlist
-        )
+      const updated = playlists.map((playlist) =>
+        playlist.id === id
+          ? { ...playlist, name: response.data.name }
+          : playlist
       );
+      setPlaylists(updated);
+      savePlaylistsToLocalStorage(updated);
       toast.success("تم التعديل بنجاح");
     } catch (error) {
       toast.error("فشل في التعديل");
     }
   };
 
-  const deletePlaylist = async (id) => {
+  const confirmDeletePlaylist = (id) => {
+    setSelectedPlaylistId(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const deletePlaylist = async () => {
     try {
-      await api.delete(`playlists/${id}/`, {
+      await api.delete(`playlists/${selectedPlaylistId}/`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
-      setPlaylists(playlists.filter((playlist) => playlist.id !== id));
+      const updated = playlists.filter(
+        (playlist) => playlist.id !== selectedPlaylistId
+      );
+      setPlaylists(updated);
+      savePlaylistsToLocalStorage(updated);
       toast.success("تم الحذف بنجاح");
     } catch (error) {
       toast.error("فشل في الحذف");
+    } finally {
+      setDeleteConfirmOpen(false);
     }
   };
 
@@ -155,108 +186,122 @@ export default function PlaylistPage() {
         component="main"
         sx={{ flexGrow: 1, width: "100%", position: "relative" }}
       >
-        {isMobile && (
-          <AppBar
-            position="sticky"
-            sx={{
-              bgcolor: darkMode ? "#1e1e1e" : "#f5f5f5",
-              boxShadow: "none",
-              height: "56px",
-              zIndex: 1100,
-            }}
-          >
-            <Toolbar
-              sx={{
-                minHeight: "56px !important",
-                px: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                onClick={() => setMobileOpen(!mobileOpen)}
-                sx={{ p: 0 }}
-              >
-                <MenuIcon
-                  sx={{ color: darkMode ? "#fff" : "#000", fontSize: 24 }}
-                />
-              </IconButton>
-              <Typography
-                variant="h6"
-                sx={{ color: darkMode ? "#fff" : "#000", fontWeight: "bold" }}
-              >
-                Playlists
-              </Typography>
-            </Toolbar>
-          </AppBar>
-        )}
-
         <Box sx={{ px: 2, py: 4 }}>
-          <Grid container spacing={4} justifyContent="center">
-            {playlists.map((playlist, i) => (
-              <Grid item xs={12} key={i}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.2 }}
-                  whileHover={{ scale: 1.01 }}
-                >
-                  <Paper
-                    sx={{
-                      p: 3,
-                      borderRadius: 4,
-                      boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-                      bgcolor: darkMode ? "#1e1e1e" : "#fff",
-                    }}
+          {playlists.length === 0 ? (
+            <Typography align="center" color={darkMode ? "#ccc" : "#555"}>
+              لا توجد قوائم تشغيل
+            </Typography>
+          ) : (
+            <Grid container spacing={4} justifyContent="center">
+              {playlists.map((playlist, i) => (
+                <Grid item xs={12} key={playlist.id}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: i * 0.2 }}
+                    whileHover={{ scale: 1.01 }}
                   >
-                    <Box
+                    <Paper
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        mb: 1,
-                        gap: 1,
+                        p: 3,
+                        borderRadius: 4,
+                        boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+                        bgcolor: darkMode ? "#1e1e1e" : "#fff",
                       }}
                     >
-                      <Typography
-                        variant="h5"
-                        fontWeight="bold"
-                        color={darkMode ? "#fff" : "#000"}
-                      >
-                        {playlist.name}
-                      </Typography>
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          setNewPlaylistName(playlist.name);
-                          setEditIndex(i);
-                          setDialogOpen(true);
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          mb: 1,
+                          gap: 1,
                         }}
                       >
-                        تعديل
-                      </Button>
-                      <Button
-                        size="small"
-                        color="error"
-                        onClick={() => deletePlaylist(playlist.id)}
+                        <Typography
+                          variant="h5"
+                          fontWeight="bold"
+                          color={darkMode ? "#fff" : "#000"}
+                        >
+                          {playlist.name}
+                        </Typography>
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            setNewPlaylistName(playlist.name);
+                            setEditIndex(i);
+                            setDialogOpen(true);
+                          }}
+                        >
+                          تعديل
+                        </Button>
+                        <Button
+                          size="small"
+                          color="error"
+                          onClick={() => confirmDeletePlaylist(playlist.id)}
+                        >
+                          حذف
+                        </Button>
+                      </Box>
+                      <Typography
+                        variant="subtitle2"
+                        color={darkMode ? "#aaa" : "#555"}
                       >
-                        حذف
-                      </Button>
-                    </Box>
-                    <Typography
-                      variant="subtitle2"
-                      color={darkMode ? "#aaa" : "#555"}
-                    >
-                      Created by: {getUsername()}
-                    </Typography>
-                  </Paper>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
+                        Created by: {getUsername()}
+                      </Typography>
+
+                      <Grid container spacing={2} mt={2}>
+                        {playlist.items?.map((item) => (
+                          <Grid
+                            item
+                            xs={12}
+                            sm={6}
+                            md={4}
+                            key={item.id}
+                            onClick={() =>
+                              navigate(`/live/${item.stream.youtube_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
+                          >
+                            <Card
+                              sx={{
+                                bgcolor: darkMode ? "#222" : "#fff",
+                                color: darkMode ? "#fff" : "#000",
+                              }}
+                            >
+                              <CardMedia
+                                component="img"
+                                height="140"
+                                image={
+                                  item.stream.thumbnail ||
+                                  "https://via.placeholder.com/320x180.png?text=No+Thumbnail"
+                                }
+                                alt={item.stream.title}
+                              />
+                              <CardContent>
+                                <Typography
+                                  variant="subtitle1"
+                                  fontWeight={600}
+                                >
+                                  {item.stream.title}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color={darkMode ? "#ccc" : "text.secondary"}
+                                >
+                                  التصنيف:{" "}
+                                  {item.stream.category_name || "غير محدد"}
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Paper>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          )}
 
           <Fab
             onClick={() => {
@@ -305,6 +350,22 @@ export default function PlaylistPage() {
                 }}
               >
                 {editIndex !== null ? "حفظ" : "إضافة"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            open={deleteConfirmOpen}
+            onClose={() => setDeleteConfirmOpen(false)}
+          >
+            <DialogTitle>تأكيد الحذف</DialogTitle>
+            <DialogContent>
+              <Typography>هل أنت متأكد أنك تريد حذف هذه القائمة؟</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDeleteConfirmOpen(false)}>إلغاء</Button>
+              <Button onClick={deletePlaylist} color="error">
+                حذف
               </Button>
             </DialogActions>
           </Dialog>

@@ -10,16 +10,18 @@ import {
 import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import GETALLCAT from "../../redux/action/CatgAction";
 
 export default function Categories() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { catg: categories, isLoading } = useSelector((state) => state.catg);
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
 
   useEffect(() => {
-    dispatch(GETALLCAT()); // هذا يفترض أنه يجلب البيانات من API الصحيح
+    dispatch(GETALLCAT());
   }, []);
 
   return (
@@ -28,7 +30,7 @@ export default function Categories() {
         variant="h6"
         sx={{ color: darkMode ? "#fff" : "#000", mb: 2 }}
       >
-        categories
+        Categories
       </Typography>
 
       <Grid container spacing={2}>
@@ -41,6 +43,7 @@ export default function Categories() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Card
+                  onClick={() => navigate(`/category/${cat.id}`)}
                   sx={{
                     bgcolor: darkMode ? "#1e1e1e" : "#fafafa",
                     color: darkMode ? "#fff" : "#000",
@@ -58,13 +61,7 @@ export default function Categories() {
                     alt={cat.name}
                   />
                   <CardContent>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{
-                        fontWeight: 500,
-                        color: darkMode ? "#fff" : "#000",
-                      }}
-                    >
+                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                       {cat.name}
                     </Typography>
                   </CardContent>

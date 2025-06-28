@@ -36,13 +36,29 @@ const useRegisterHook = () => {
     setLoading(true);
     try {
       const res = await Baseurl.post("/api/register/", {
-        username: name, // ✅ التعديل هنا
+        username: name,
         email,
         password,
       });
 
+      console.log("📦 Response from server:", res.data);
+
+      const data = res.data;
+
+      const access = data.access || data.token || data.tokens?.access;
+      const refresh = data.refresh || data.tokens?.refresh;
+      const username = data.username || data.user?.username || name;
+      const userEmail = data.email || data.user?.email || email;
+
+      if (access) localStorage.setItem("accessToken", access);
+      if (refresh) localStorage.setItem("refreshToken", refresh);
+      if (username) localStorage.setItem("username", username);
+      if (userEmail) localStorage.setItem("email", userEmail);
+
+      // ✅ تحديث حالة الضيف
+      localStorage.setItem("isGuest", "false");
+
       notify("تم التسجيل بنجاح", "success");
-       localStorage.setItem("username", name); 
       setLoading(false);
       return true;
     } catch (err) {

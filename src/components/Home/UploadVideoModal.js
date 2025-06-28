@@ -8,43 +8,41 @@ import {
   MenuItem,
   InputLabel,
 } from "@mui/material";
-import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
+import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../Api/axiosInstance";
 
-export default function BroadcastModal({ open, onClose }) {
+export default function UploadVideoModal({ open, onClose }) {
   const [title, setTitle] = useState("");
-  const [youtubeId, setYoutubeId] = useState("");
-  const [status, setStatus] = useState("live");
   const [category, setCategory] = useState("");
-  const [thumbnail, setThumbnail] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [categories, setCategories] = useState([]);
 
-  const navigate = useNavigate();
   const themeMode = localStorage.getItem("themeMode") || "light";
   const darkMode = themeMode === "dark";
 
   useEffect(() => {
     axiosInstance
       .get("https://dev1hunter.pythonanywhere.com/live/api/categories/")
-      .then((res) => {
-        const unique = Array.from(
-          new Set(res.data.map((item) => item.name))
-        ).map((name) => res.data.find((item) => item.name === name));
-        setCategories(unique);
-      })
-      .catch(() => toast.error("Failed to load categories"));
+      .then((res) => setCategories(res.data))
+      .catch(() => toast.error("فشل تحميل التصنيفات"));
   }, []);
 
   const handleSubmit = () => {
-    if (!title || !youtubeId || !status || !category || !thumbnail) {
-      toast.error("Please fill in all fields and upload a thumbnail");
+    if (!title || !category || !videoFile || !thumbnailFile) {
+      toast.error("يرجى تعبئة جميع الحقول واختيار ملفات الفيديو والصورة");
       return;
     }
 
-    if (!["image/jpeg", "image/png"].includes(thumbnail.type)) {
-      toast.error("Thumbnail must be JPG or PNG");
+    const allowedImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "image/webp",
+    ];
+    if (!allowedImageTypes.includes(thumbnailFile.type)) {
+      toast.error("الصورة المصغرة يجب أن تكون بصيغة JPG أو PNG أو WEBP");
       return;
     }
 
@@ -52,14 +50,14 @@ export default function BroadcastModal({ open, onClose }) {
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("youtube_id", youtubeId);
-    formData.append("status", status);
+    formData.append("status", "live");
     formData.append("category", category);
-    formData.append("thumbnail", thumbnail);
+    formData.append("video_file", videoFile); // لا يوجد تحقق لنوع الملف
+    formData.append("thumbnail", thumbnailFile);
 
     axiosInstance
       .post(
-        "https://dev1hunter.pythonanywhere.com/live/api/streams/",
+        "https://dev1hunter.pythonanywhere.com/live/api/videos/",
         formData,
         {
           headers: {
@@ -68,37 +66,17 @@ export default function BroadcastModal({ open, onClose }) {
           },
         }
       )
-      .then((res) => {
-        toast.success("✅ Stream published successfully");
-
-        if (status === "live") {
-          const newStream = {
-            id: res.data.id,
-            title,
-            youtubeId,
-            status,
-            category,
-            thumbnailName: thumbnail.name,
-            createdAt: new Date().toISOString(),
-          };
-
-          const existing = JSON.parse(localStorage.getItem("myStreams")) || [];
-          const updated = [...existing, newStream];
-          localStorage.setItem("myStreams", JSON.stringify(updated));
-        }
-
+      .then(() => {
+        toast.success("✅ تم رفع البيانات بنجاح");
         setTitle("");
-        setYoutubeId("");
-        setStatus("live");
         setCategory("");
-        setThumbnail(null);
+        setVideoFile(null);
+        setThumbnailFile(null);
         onClose();
-
-        navigate(`/live/${youtubeId}`);
       })
       .catch((err) => {
-        toast.error("❌ Failed to publish stream");
         console.error(err);
+        toast.error("❌ فشل رفع البيانات");
       });
   };
 
@@ -110,7 +88,7 @@ export default function BroadcastModal({ open, onClose }) {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          bgcolor: darkMode ? "#1e1e1e" : "background.paper",
+          bgcolor: darkMode ? "#1e1e1e" : "#fff",
           color: darkMode ? "#fff" : "#000",
           p: 4,
           borderRadius: 2,
@@ -119,14 +97,14 @@ export default function BroadcastModal({ open, onClose }) {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <VideoCameraFrontIcon sx={{ mr: 1 }} color="primary" />
+          <VideoLibraryIcon sx={{ mr: 1 }} color="primary" />
           <Typography variant="h6" fontWeight="bold">
-            Create New Live Stream
+            رفع فيديو مسجل
           </Typography>
         </Box>
 
         <TextField
-          label="Title"
+          label="العنوان"
           fullWidth
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -136,33 +114,8 @@ export default function BroadcastModal({ open, onClose }) {
         />
 
         <TextField
-          label="Youtube ID"
-          fullWidth
-          value={youtubeId}
-          onChange={(e) => setYoutubeId(e.target.value)}
-          sx={{ mb: 2 }}
-          InputLabelProps={{ style: { color: darkMode ? "#aaa" : undefined } }}
-          InputProps={{ style: { color: darkMode ? "#fff" : undefined } }}
-        />
-
-        <TextField
           select
-          label="Status"
-          fullWidth
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          sx={{ mb: 2 }}
-          InputLabelProps={{ style: { color: darkMode ? "#aaa" : undefined } }}
-          InputProps={{ style: { color: darkMode ? "#fff" : undefined } }}
-        >
-          <MenuItem value="live">Live</MenuItem>
-          <MenuItem value="upcoming">Upcoming</MenuItem>
-          <MenuItem value="ended">Ended</MenuItem>
-        </TextField>
-
-        <TextField
-          select
-          label="Category"
+          label="التصنيف"
           fullWidth
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -170,9 +123,6 @@ export default function BroadcastModal({ open, onClose }) {
           InputLabelProps={{ style: { color: darkMode ? "#aaa" : undefined } }}
           InputProps={{ style: { color: darkMode ? "#fff" : undefined } }}
         >
-          <MenuItem value="" disabled>
-            Select Category
-          </MenuItem>
           {categories.map((cat) => (
             <MenuItem key={cat.id} value={cat.id}>
               {cat.name}
@@ -180,6 +130,44 @@ export default function BroadcastModal({ open, onClose }) {
           ))}
         </TextField>
 
+        {/* رفع ملف الفيديو */}
+        <Box
+          sx={{
+            border: `2px dashed ${darkMode ? "#555" : "#ccc"}`,
+            p: 2,
+            borderRadius: 2,
+            textAlign: "center",
+            cursor: "pointer",
+            mb: 2,
+            color: darkMode ? "#aaa" : "#333",
+            backgroundColor: darkMode ? "#2a2a2a" : "#fafafa",
+          }}
+        >
+          <InputLabel
+            htmlFor="video-upload"
+            sx={{
+              cursor: "pointer",
+              fontWeight: 500,
+              color: darkMode ? "#aaa" : "#555",
+            }}
+          >
+            انقر لرفع ملف الفيديو (بدون قيود)
+          </InputLabel>
+          <input
+            id="video-upload"
+            type="file"
+            accept="*"
+            onChange={(e) => setVideoFile(e.target.files[0])}
+            style={{ display: "none" }}
+          />
+          {videoFile && (
+            <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
+              الملف المختار: {videoFile.name}
+            </Typography>
+          )}
+        </Box>
+
+        {/* رفع صورة مصغرة */}
         <Box
           sx={{
             border: `2px dashed ${darkMode ? "#555" : "#ccc"}`,
@@ -200,24 +188,24 @@ export default function BroadcastModal({ open, onClose }) {
               color: darkMode ? "#aaa" : "#555",
             }}
           >
-            Click to upload a thumbnail
+            انقر لرفع صورة مصغرة (Thumbnail)
           </InputLabel>
           <input
             id="thumbnail-upload"
             type="file"
             accept="image/*"
-            onChange={(e) => setThumbnail(e.target.files[0])}
+            onChange={(e) => setThumbnailFile(e.target.files[0])}
             style={{ display: "none" }}
           />
-          {thumbnail && (
+          {thumbnailFile && (
             <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
-              Selected: {thumbnail.name}
+              الصورة المختارة: {thumbnailFile.name}
             </Typography>
           )}
         </Box>
 
         <Button fullWidth variant="contained" onClick={handleSubmit}>
-          Publish Stream
+          رفع الفيديو
         </Button>
 
         <Button
@@ -226,7 +214,7 @@ export default function BroadcastModal({ open, onClose }) {
           onClick={onClose}
           sx={{ mt: 1, fontSize: "14px", color: darkMode ? "#fff" : undefined }}
         >
-          Cancel
+          إلغاء
         </Button>
       </Box>
     </Modal>

@@ -1,4 +1,3 @@
-// File: src/components/Live/SuggestedVideos.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -7,15 +6,26 @@ import {
   CardMedia,
   CardContent,
   Chip,
-  Avatar,
   Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+  Button,
 } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function SuggestedVideos({ currentId }) {
   const [videos, setVideos] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [playlists, setPlaylists] = useState([]);
+
   const navigate = useNavigate();
+
+  const themeMode = localStorage.getItem("themeMode") || "light";
+  const darkMode = themeMode === "dark";
 
   useEffect(() => {
     axios
@@ -29,6 +39,13 @@ export default function SuggestedVideos({ currentId }) {
       .catch((error) => {
         console.error("Error fetching suggested videos:", error);
       });
+
+    try {
+      const stored = localStorage.getItem("playlists");
+      if (stored) setPlaylists(JSON.parse(stored));
+    } catch (err) {
+      console.error("Failed to load playlists from localStorage:", err);
+    }
   }, [currentId]);
 
   const cardVariants = {
@@ -44,11 +61,57 @@ export default function SuggestedVideos({ currentId }) {
     }),
   };
 
+  const handleMenuOpen = (event, video) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setSelectedVideo(video);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedVideo(null);
+  };
+
+  const handleAddToPlaylist = async (playlistId) => {
+    if (!selectedVideo || !playlistId) return;
+    try {
+      await axios.post(
+        `https://dev1hunter.pythonanywhere.com/live/api/playlists/${playlistId}/add/`,
+        {
+          stream_id: selectedVideo.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      alert("✅ تم حفظ الفيديو في قائمة التشغيل");
+    } catch (error) {
+      const errorMsg =
+        error?.response?.data?.detail || "❌ حدث خطأ أثناء الإضافة";
+      alert(errorMsg);
+      console.error("فشل في الإضافة:", error);
+    } finally {
+      handleMenuClose();
+    }
+  };
+
   return (
-    <Box sx={{ mt: 6, px: 2, width: "100%", maxWidth: 960 }}>
-      <Typography variant="h6" gutterBottom>
+    <Box
+      sx={{
+        mt: 6,
+        px: 2,
+        width: "100%",
+        maxWidth: 960,
+        bgcolor: darkMode ? "#121212" : "#f9f9f9",
+        color: darkMode ? "#fff" : "#000",
+      }}
+    >
+      <Typography variant="h6" sx={{ mb: 2 }}>
         فيديوهات مقترحة
       </Typography>
+
       <Grid container spacing={2}>
         {videos.map((video, index) => (
           <Grid item xs={12} sm={6} md={4} key={video.id}>
@@ -63,13 +126,16 @@ export default function SuggestedVideos({ currentId }) {
                 cursor: "pointer",
                 borderRadius: 12,
                 overflow: "hidden",
+                position: "relative",
               }}
             >
               <Box
                 sx={{
-                  bgcolor: "#fff",
+                  bgcolor: darkMode ? "#1e1e1e" : "#fff",
+                  color: darkMode ? "#fff" : "#000",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                   borderRadius: 2,
+                  position: "relative",
                 }}
               >
                 <CardMedia
@@ -97,16 +163,60 @@ export default function SuggestedVideos({ currentId }) {
 
                   <Typography
                     variant="caption"
-                    sx={{ color: "#888", display: "block", mt: 0.5 }}
+                    sx={{
+                      color: darkMode ? "#ccc" : "#888",
+                      display: "block",
+                      mt: 0.5,
+                    }}
                   >
                     التصنيف: {video.category_name || "غير محدد"}
                   </Typography>
                 </CardContent>
+
+                {/* زر الثلاث نقاط خارج CardContent */}
+                <IconButton
+                  onClick={(e) => handleMenuOpen(e, video)}
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    zIndex: 2,
+                    bgcolor: darkMode ? "#2e2e2e" : "#ffffff",
+                    boxShadow: 1,
+                  }}
+                >
+                  <MoreVertIcon sx={{ color: darkMode ? "#ccc" : "#555" }} />
+                </IconButton>
               </Box>
             </motion.div>
           </Grid>
         ))}
       </Grid>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            bgcolor: darkMode ? "#2c2c2c" : "#fff",
+            color: darkMode ? "#fff" : "#000",
+          },
+        }}
+      >
+        {playlists.length > 0 ? (
+          playlists.map((playlist) => (
+            <MenuItem
+              key={playlist.id}
+              onClick={() => handleAddToPlaylist(playlist.id)}
+            >
+              {playlist.name}
+            </MenuItem>
+          ))
+        ) : (
+          <MenuItem disabled>لا توجد قوائم تشغيل</MenuItem>
+        )}
+      </Menu>
     </Box>
   );
 }

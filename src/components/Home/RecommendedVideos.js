@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -7,45 +7,40 @@ import {
   CardMedia,
   CardContent,
   Avatar,
-  Button,
   IconButton,
   Menu,
   MenuItem,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Tilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import axios from "axios";
-
-const recommended = [
-  {
-    title: "Warzone Highlights",
-    image: "https://i.imgur.com/BY0n7Zx.jpg",
-    streamer: "AvaDrex",
-  },
-  {
-    title: "Epic LoL Battles",
-    image: "https://i.imgur.com/4EZbn4V.jpg",
-    streamer: "GamerQueen",
-  },
-  {
-    title: "Best Snipes 2024",
-    image: "https://i.imgur.com/Nfzkfvl.jpg",
-    streamer: "SniperWolf",
-  },
-  {
-    title: "Underrated Gems",
-    image: "https://i.imgur.com/s0kYIgh.jpg",
-    streamer: "ChadMaster",
-  },
-];
+import Tilt from "react-parallax-tilt";
 
 export default function RecommendedVideos() {
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [recommended, setRecommended] = useState([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("shuffledRecommended");
+    if (saved) {
+      setRecommended(JSON.parse(saved));
+    } else {
+      axios
+        .get("https://dev1hunter.pythonanywhere.com/live/api/streams/")
+        .then((res) => {
+          const shuffled = [...res.data].sort(() => Math.random() - 0.5);
+          localStorage.setItem("shuffledRecommended", JSON.stringify(shuffled));
+          setRecommended(shuffled);
+        })
+        .catch((err) => {
+          console.error("فشل في جلب الفيديوهات:", err);
+        });
+    }
+  }, []);
 
   const handleMenuOpen = (event, video) => {
     setAnchorEl(event.currentTarget);
@@ -64,8 +59,8 @@ export default function RecommendedVideos() {
         "https://dev1hunter.pythonanywhere.com/modle/live/api/playlists/1/add/",
         {
           title: selectedVideo.title,
-          image: selectedVideo.image,
-          streamer: selectedVideo.streamer,
+          image: selectedVideo.thumbnail,
+          streamer: selectedVideo.streamer || "Unknown",
         }
       );
       alert("تمت الإضافة إلى قائمة التشغيل ✅");
@@ -89,11 +84,17 @@ export default function RecommendedVideos() {
       <Grid container spacing={2}>
         {recommended.map((video, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Tilt glareEnable={true} glareMaxOpacity={0.15} scale={1.05}>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Tilt
+                glareEnable={true}
+                glareMaxOpacity={0.1}
+                scale={1.03}
+                tiltMaxAngleX={10}
+                tiltMaxAngleY={10}
               >
                 <Card
                   sx={{
@@ -121,12 +122,19 @@ export default function RecommendedVideos() {
                   <CardMedia
                     component="img"
                     height="140"
-                    image={video.image}
+                    image={
+                      video.thumbnail ||
+                      "https://via.placeholder.com/320x180.png?text=No+Thumbnail"
+                    }
                     alt={video.title}
                   />
                   <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                      {video.title}
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 500 }}
+                      noWrap
+                    >
+                      {video.title || "No Title"}
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                       <Avatar sx={{ width: 24, height: 24, mr: 1 }} />
@@ -134,13 +142,13 @@ export default function RecommendedVideos() {
                         variant="caption"
                         sx={{ color: darkMode ? "#ccc" : "text.secondary" }}
                       >
-                        {video.streamer}
+                        {video.streamer || "مستخدم غير معروف"}
                       </Typography>
                     </Box>
                   </CardContent>
                 </Card>
-              </motion.div>
-            </Tilt>
+              </Tilt>
+            </motion.div>
           </Grid>
         ))}
       </Grid>

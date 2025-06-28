@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Avatar,
-  Paper,
   useMediaQuery,
   Drawer,
   IconButton,
   Toolbar,
   AppBar,
+  Card,
+  CardMedia,
+  CardContent,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { motion } from "framer-motion";
@@ -16,51 +17,50 @@ import { useSelector } from "react-redux";
 import Sidebar from "../components/Home/Sidebar";
 import { SIDEBAR_WIDTH } from "../redux/type";
 import { ToastContainer } from "react-toastify";
-
-
-const mockTrendingVideos = [
-  {
-    id: 1,
-    title: "Best Moments of 2025",
-    description: "Watch the top viral clips of the year!",
-    thumbnail: "https://via.placeholder.com/100x100.png?text=Video+1",
-  },
-  {
-    id: 2,
-    title: "Gaming Highlights",
-    description: "Top plays from your favorite streamers.",
-    thumbnail: "https://via.placeholder.com/100x100.png?text=Video+2",
-  },
-  {
-    id: 3,
-    title: "Live Concert Experience",
-    description: "Enjoy an immersive live concert session.",
-    thumbnail: "https://via.placeholder.com/100x100.png?text=Video+3",
-  },
-  {
-    id: 4,
-    title: "Epic Fails Compilation",
-    description: "Laugh out loud at these hilarious fails.",
-    thumbnail: "https://via.placeholder.com/100x100.png?text=Video+4",
-  },
-];
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function TrendingPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [videos, setVideos] = useState([]);
   const isMobile = useMediaQuery("(max-width:768px)");
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("shuffledTrending");
+    if (saved) {
+      setVideos(JSON.parse(saved));
+    } else {
+      axios
+        .get("https://dev1hunter.pythonanywhere.com/live/api/streams/")
+        .then((res) => {
+          const shuffled = [...res.data].sort(() => Math.random() - 0.5);
+          localStorage.setItem("shuffledTrending", JSON.stringify(shuffled));
+          setVideos(shuffled);
+        })
+        .catch((err) => {
+          console.error("فشل في جلب الفيديوهات:", err);
+        });
+    }
+  }, []);
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: darkMode ? "#121212" : "#fff" }}>
-      {/* Sidebar Desktop */}
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: darkMode ? "#121212" : "#fff",
+      }}
+    >
       {!isMobile && (
-        <Box sx={{ width: 240, flexShrink: 0 }}>
+        <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>
           <Sidebar includeProfileAndNotifications={true} />
         </Box>
       )}
 
-      {/* Sidebar Mobile */}
       {isMobile && (
         <Drawer
           variant="temporary"
@@ -72,7 +72,7 @@ export default function TrendingPage() {
             zIndex: 1401,
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
-              width: 240,
+              width: SIDEBAR_WIDTH,
               bgcolor: darkMode ? "#121212" : "#f9f9f9",
               color: darkMode ? "#fff" : "#000",
               height: "100vh",
@@ -83,17 +83,14 @@ export default function TrendingPage() {
             },
           }}
         >
-     
-  <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0 }}>
-    <Sidebar includeProfileAndNotifications={true} />
-  </Box>
-
+          <Sidebar includeProfileAndNotifications={true} />
         </Drawer>
       )}
 
-      {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1, width: "100%", overflowY: "auto" }}>
-        {/* AppBar + Header */}
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, width: "100%", overflowY: "auto" }}
+      >
         {isMobile && (
           <AppBar
             position="sticky"
@@ -120,9 +117,14 @@ export default function TrendingPage() {
                 onClick={() => setMobileOpen(!mobileOpen)}
                 sx={{ p: 0 }}
               >
-                <MenuIcon sx={{ color: darkMode ? "#fff" : "#000", fontSize: 24 }} />
+                <MenuIcon
+                  sx={{ color: darkMode ? "#fff" : "#000", fontSize: 24 }}
+                />
               </IconButton>
-              <Typography variant="h6" sx={{ color: darkMode ? "#fff" : "#000", fontWeight: "bold" }}>
+              <Typography
+                variant="h6"
+                sx={{ color: darkMode ? "#fff" : "#000", fontWeight: "bold" }}
+              >
                 Trending
               </Typography>
             </Toolbar>
@@ -151,53 +153,55 @@ export default function TrendingPage() {
               Trending Videos
             </Typography>
           </motion.div>
-  <ToastContainer position="top-right" /> 
+
+          <ToastContainer position="top-right" />
+
           <Box
             sx={{
               display: "grid",
-              gap: 2,
-              maxWidth: 800,
+              gap: 3,
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "1fr 1fr",
+                md: "1fr 1fr 1fr",
+              },
+              maxWidth: 1200,
               width: "100%",
             }}
           >
-            {mockTrendingVideos.map((video, index) => (
+            {videos.map((video, index) => (
               <motion.div
-                key={video.id}
+                key={video.id || index}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.4 }}
               >
-                <Paper
-                  elevation={1}
+                <Card
                   sx={{
-                    p: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    borderRadius: 3,
-                    bgcolor: darkMode ? "#1e1e1e" : "#f5f5f5",
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+                    cursor: "pointer",
+                    bgcolor: darkMode ? "#1e1e1e" : "#fff",
+                    color: darkMode ? "#fff" : "#000",
+                    borderRadius: 2,
                   }}
+                  onClick={() => navigate(`/live/${video.youtube_id}`)}
                 >
-                  <Avatar
-                    src={video.thumbnail}
-                    sx={{
-                      width: 60,
-                      height: 60,
-                      mr: 2,
-                      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                    }}
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={
+                      video.thumbnail ||
+                      "https://via.placeholder.com/320x180.png?text=No+Thumbnail"
+                    }
+                    alt={video.title}
                   />
-                  <Box>
-                    <Typography fontWeight="600" fontSize={16} color={darkMode ? "#fff" : "#111"}>
-                      {video.title}
+                  <CardContent>
+                    <Typography fontWeight="bold" noWrap>
+                      {video.title || "No Title"}
                     </Typography>
-                    <Typography variant="body2" color={darkMode ? "#ccc" : "#555"}>
-                      {video.description}
-                    </Typography>
-                  </Box>
-                </Paper>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </Box>

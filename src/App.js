@@ -18,6 +18,8 @@ import VideoPage from "./pages/VideoPage";
 import Playlist from "./pages/Playlist";
 import LiveStreamPage from "./pages/LiveStreamPage";
 import SearchResultsPage from "./pages/SearchResultsPage";
+import CategoryVideos from "./pages/CategoryVideos";
+import Profile from "./pages/Profile";
 
 function App() {
   const [mode, setMode] = useState("light");
@@ -68,6 +70,8 @@ function App() {
           <Route path="/playlist" element={<Playlist />} />
           <Route path="/live/:id" element={<LiveStreamPage />} />
           <Route path="/search" element={<SearchResultsPage />} />
+          <Route path="/category/:id" element={<CategoryVideos />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </ThemeProvider>

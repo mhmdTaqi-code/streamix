@@ -65,7 +65,7 @@ export default function FollowPage() {
     try {
       await axiosInstance.post(
         `https://dev1hunter.pythonanywhere.com/unfollow/${username}/`,
-        {}, // جسم الطلب فارغ
+        {},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -90,6 +90,7 @@ export default function FollowPage() {
         display: "flex",
         bgcolor: darkMode ? "#121212" : "#fff",
         minHeight: "100vh",
+        color: darkMode ? "#fff" : "#000",
       }}
     >
       <ToastContainer />
@@ -128,9 +129,8 @@ export default function FollowPage() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          background: darkMode
-            ? "#1e1e1e"
-            : "linear-gradient(145deg, #fdfbfb, #ebedee)",
+          backgroundColor: darkMode ? "#1e1e1e" : "#f0f0f0",
+          color: darkMode ? "#fff" : "#000",
         }}
       >
         <motion.div
@@ -143,9 +143,7 @@ export default function FollowPage() {
             fontWeight="bold"
             mb={5}
             sx={{
-              background: "linear-gradient(to right, #5f2c82, #49a09d)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              color: darkMode ? "#fff" : "#222",
               textShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
               fontSize: { xs: "28px", sm: "36px" },
               textAlign: "center",
@@ -157,7 +155,10 @@ export default function FollowPage() {
 
         <Box sx={{ display: "grid", gap: 3, maxWidth: 800, width: "100%" }}>
           {following.length === 0 ? (
-            <Typography color="text.secondary" textAlign="center">
+            <Typography
+              color={darkMode ? "#ccc" : "text.secondary"}
+              textAlign="center"
+            >
               لا تتابع أي شخص حاليًا.
             </Typography>
           ) : (
@@ -171,9 +172,7 @@ export default function FollowPage() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 style={{
                   borderRadius: "16px",
-                  background: darkMode
-                    ? "linear-gradient(to right, #232526, #414345)"
-                    : "linear-gradient(to right, #fdfbfb, #ebedee)",
+                  backgroundColor: darkMode ? "#2a2a2a" : "#f0f0f0",
                   boxShadow: darkMode
                     ? "0 4px 16px rgba(0,0,0,0.4)"
                     : "0 4px 16px rgba(0,0,0,0.08)",
@@ -187,6 +186,7 @@ export default function FollowPage() {
                     alignItems: "center",
                     background: "transparent",
                     borderRadius: "16px",
+                    color: darkMode ? "#fff" : "#000",
                   }}
                 >
                   <Avatar
@@ -201,7 +201,11 @@ export default function FollowPage() {
                     }}
                   />
                   <Box flexGrow={1}>
-                    <Typography fontWeight="bold" fontSize={18}>
+                    <Typography
+                      fontWeight="bold"
+                      fontSize={18}
+                      sx={{ color: darkMode ? "#fff" : "#000" }}
+                    >
                       {user.username}
                     </Typography>
                     <Typography
@@ -217,14 +221,12 @@ export default function FollowPage() {
                     onClick={() => handleUnfollow(user.username)}
                     sx={{
                       borderRadius: 3,
-                      background:
-                        "linear-gradient(to right,rgb(87, 87, 87),rgb(230, 230, 230))",
+                      backgroundColor: "#888",
                       color: "#fff",
                       textTransform: "none",
                       fontWeight: "bold",
                       "&:hover": {
-                        background:
-                          "linear-gradient(to right, #ff4b2b, #ff416c)",
+                        backgroundColor: "#e53935",
                       },
                     }}
                   >
