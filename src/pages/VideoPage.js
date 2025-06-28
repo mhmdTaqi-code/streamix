@@ -5,37 +5,36 @@ import { Box, Typography, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 
 // Mock video data
-const videoData = 
-    [
+const videoData = [
   {
     title: "Best Moments of 2025",
     description: "Watch the top viral clips of the year!",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4"
+    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
-   {
+  {
     title: "Gaming Highlights",
     description: "Top plays from your favorite streamers.",
-    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+    videoUrl: "https://www.w3schools.com/html/movie.mp4",
   },
-   {
+  {
     title: "Live Concert Experience",
     description: "Enjoy an immersive live concert session.",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4"
+    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
-   {
+  {
     title: "Epic Fails Compilation",
     description: "Laugh out loud at these hilarious fails.",
-    videoUrl: "https://www.w3schools.com/html/movie.mp4"
+    videoUrl: "https://www.w3schools.com/html/movie.mp4",
   },
-  ]
+];
 
 export default function VideoPage() {
-//   const { id } = useParams();
-  const video = videoData.map((item)=> (item))
+  //   const { id } = useParams();
+  const video = videoData.map((item) => item);
 
-//   if (!video) {
-//     return <Typography sx={{ p: 4 }}>Video not found.</Typography>;
-//   }
+  //   if (!video) {
+  //     return <Typography sx={{ p: 4 }}>Video not found.</Typography>;
+  //   }
 
   return (
     <Box

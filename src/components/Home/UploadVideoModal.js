@@ -151,7 +151,7 @@ export default function UploadVideoModal({ open, onClose }) {
               color: darkMode ? "#aaa" : "#555",
             }}
           >
-            انقر لرفع ملف الفيديو (بدون قيود)
+            انقر لرفع ملف الفيديو
           </InputLabel>
           <input
             id="video-upload"
