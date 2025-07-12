@@ -31,6 +31,7 @@ export default function LiveStreamPage() {
   const [loading, setLoading] = useState(true);
   const [showDashboard, setShowDashboard] = useState(false);
   const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [ownerProfile, setOwnerProfile] = useState(null);
 
   const isMobile = useMediaQuery("(max-width:768px)");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -48,6 +49,27 @@ export default function LiveStreamPage() {
         const username = localStorage.getItem("username");
         if (match && username && match.owner_name === username) {
           setShowDashboard(true);
+        }
+
+        // جلب بيانات صورة صاحب البث
+        if (match?.owner_name) {
+          axios
+            .get(
+              `https://dev1hunter.pythonanywhere.com/profile/${match.owner_name}/`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "accessToken"
+                  )}`,
+                },
+              }
+            )
+            .then((res) => {
+              setOwnerProfile(res.data);
+            })
+            .catch((err) => {
+              console.error("فشل تحميل بيانات البروفايل", err);
+            });
         }
       })
       .catch((error) => {
@@ -249,18 +271,46 @@ export default function LiveStreamPage() {
             </Card>
           </Box>
 
-          <Typography
-            variant="body2"
+          {/* صورة واسم صاحب البث */}
+          <Box
             sx={{
-              mb: 3,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               mt: 2,
-              textAlign: "center",
-              color: darkMode ? "#aaa" : "#555",
-              fontStyle: "italic",
+              mb: 3,
+              gap: 1,
+              cursor: "pointer",
+              textDecoration: "none",
             }}
+          onClick={() => navigate(`/profile?username=${stream.owner_name}`)}
+
           >
-            Createrd by {stream.owner_name}
-          </Typography>
+            <img
+              src={
+                ownerProfile?.profile_picture ||
+                ownerProfile?.user?.profile_picture ||
+                "/default-avatar.png"
+              }
+              alt={stream.owner_name}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                color: darkMode ? "#aaa" : "#555",
+                fontStyle: "italic",
+                fontWeight: 500,
+              }}
+            >
+              Created by {stream.owner_name}
+            </Typography>
+          </Box>
 
           <SuggestedVideos currentId={stream.youtube_id} />
         </Box>

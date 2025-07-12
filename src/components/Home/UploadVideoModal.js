@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../Api/axiosInstance";
 
 export default function UploadVideoModal({ open, onClose }) {
@@ -19,6 +20,7 @@ export default function UploadVideoModal({ open, onClose }) {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [categories, setCategories] = useState([]);
 
+  const navigate = useNavigate();
   const themeMode = localStorage.getItem("themeMode") || "light";
   const darkMode = themeMode === "dark";
 
@@ -52,7 +54,7 @@ export default function UploadVideoModal({ open, onClose }) {
     formData.append("title", title);
     formData.append("status", "live");
     formData.append("category", category);
-    formData.append("video_file", videoFile); // لا يوجد تحقق لنوع الملف
+    formData.append("video_file", videoFile);
     formData.append("thumbnail", thumbnailFile);
 
     axiosInstance
@@ -66,13 +68,20 @@ export default function UploadVideoModal({ open, onClose }) {
           },
         }
       )
-      .then(() => {
-        toast.success("✅ تم رفع البيانات بنجاح");
+      .then((res) => {
+        const newVideo = res.data;
+        toast.success("✅ تم رفع الفيديو بنجاح");
+
+        // إعادة تعيين الحقول
         setTitle("");
         setCategory("");
         setVideoFile(null);
         setThumbnailFile(null);
         onClose();
+
+        // الانتقال إلى الفيديو الجديد
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        navigate(`/video/${newVideo.id}`);
       })
       .catch((err) => {
         console.error(err);
@@ -151,7 +160,7 @@ export default function UploadVideoModal({ open, onClose }) {
               color: darkMode ? "#aaa" : "#555",
             }}
           >
-            انقر لرفع ملف الفيديو (بدون قيود)
+            انقر لرفع ملف الفيديو
           </InputLabel>
           <input
             id="video-upload"

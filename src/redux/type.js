@@ -1,10 +1,9 @@
 export const GetALLCatg = "GETALLCat"
 export const GetErr = "GetErr"
-
 export const REGISTER_SUCCESS = "REGISTER_SUCCESS";
 export const REGISTER_FAIL = "REGISTER_FAIL";
-
-
+export const SET_FOLLOWING = "SET_FOLLOWING";
+export const REMOVE_FOLLOWING = "REMOVE_FOLLOWING";
 export const LOGIN_USER = "LOGIN_SUCCESS";
 export const LOGIN_FAIL = "LOGIN_FAIL";
 export const SIDEBAR_WIDTH = 240;

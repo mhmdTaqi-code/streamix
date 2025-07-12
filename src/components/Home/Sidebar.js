@@ -1,6 +1,5 @@
 // Sidebar.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Box,
   Typography,
@@ -10,24 +9,20 @@ import {
   ListItemText,
   Divider,
   Avatar,
-  IconButton,
   Button,
-  Tooltip,
-  Fade,
   Switch,
 } from "@mui/material";
 import {
   Home,
   Whatshot,
   Subscriptions,
-  VideoLibrary,
-  Settings,
-  Chat,
-  AccountCircle,
+  PlaylistPlay,
+  SportsEsports,
   Logout,
   Login,
   Brightness4,
   Brightness7,
+  VideoCameraFront,
 } from "@mui/icons-material";
 import logo from "../../assets/1.png";
 import { useNavigate } from "react-router-dom";
@@ -36,24 +31,26 @@ import { toggleTheme } from "../../redux/reducers/themeReducer";
 import { SIDEBAR_WIDTH } from "../../redux/type";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import axiosInstance from "../../Api/axiosInstance";
+import imgprofile from "../../assets/profile.png"
 
 const menuItems = [
   { icon: <Home />, text: "Home", link: "/home" },
   { icon: <Whatshot />, text: "Trending", link: "/TrendingPage" },
   { icon: <Subscriptions />, text: "Following", link: "/FollowPage" },
-  { icon: <VideoLibrary />, text: "Your Videos", link: "/my-videos" },
-  { icon: <VideoLibrary />, text: "Game Center", link: "/game" },
+  { icon: <PlaylistPlay />, text: "Playlist", link: "/playlist" },
+  { icon: <SportsEsports />, text: "Game Center", link: "/game" },
+  { icon: <VideoCameraFront />, text: "Zoom", link: "/zoom" },
 ];
 
 export default function Sidebar() {
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
-  const [following, setFollowing] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const mode = useSelector((state) => state.theme.mode);
+  const following = useSelector((state) => state.following.list);
   const darkMode = mode === "dark";
-
   const isGuest = username === "Guest";
 
   useEffect(() => {
@@ -63,20 +60,13 @@ export default function Sidebar() {
     if (storedUsername) {
       setUsername(storedUsername);
 
-      axios
-        .get(
-          `https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/following/`
-        )
-        .then((res) => setFollowing(res.data))
-        .catch((err) => console.error("Error fetching following:", err));
-
-      axios
-        .get(`https://dev1hunter.pythonanywhere.com/profile/${storedUsername}/`)
+      axiosInstance
+        .get(`/profile/${storedUsername}/`)
         .then((res) => {
           const pic = res.data.profile_picture;
-          const fullUrl = pic?.startsWith("http")
+          const fullUrl = pic.startsWith("http")
             ? pic
-            : `https://dev1hunter.pythonanywhere.com${pic}`;
+            : imgprofile
           setProfilePicture(fullUrl);
         })
         .catch((err) => console.error("Error fetching profile picture:", err));
@@ -158,14 +148,10 @@ export default function Sidebar() {
           cursor: username !== "Guest" ? "pointer" : "default",
         }}
         onClick={() => {
-          if (username !== "Guest") navigate("/profile");
+          if (!isGuest) navigate("/profile");
         }}
       >
-        <Avatar
-          src={profilePicture}
-          alt={username}
-          sx={{ width: 32, height: 32 }}
-        />
+        <Avatar src={profilePicture} alt={username} sx={{ width: 32, height: 32 }} />
         <Typography variant="body1" fontWeight="bold">
           {username}
         </Typography>
@@ -185,9 +171,7 @@ export default function Sidebar() {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {darkMode ? <Brightness4 /> : <Brightness7 />}
-          <Typography fontSize={14}>
-            {darkMode ? "Dark Mode" : "Light Mode"}
-          </Typography>
+          <Typography fontSize={14}>{darkMode ? "Dark Mode" : "Light Mode"}</Typography>
         </Box>
         <Switch
           checked={darkMode}
@@ -200,7 +184,7 @@ export default function Sidebar() {
         />
       </Box>
 
-      {username === "Guest" ? (
+      {isGuest ? (
         <Button
           variant="outlined"
           fullWidth
@@ -233,15 +217,13 @@ export default function Sidebar() {
             button
             key={index}
             sx={{ borderRadius: 2 }}
-            onClick={() => {
-              if (
-                ["Playlist", "Your Videos", "Following"].includes(item.text)
-              ) {
-                handleProtectedNavigation(item.link);
-              } else {
-                navigate(item.link);
-              }
-            }}
+            onClick={() =>
+              ["Playlist", "Game Center", "Zoom", "Your Videos", "Following"].includes(
+                item.text
+              )
+                ? handleProtectedNavigation(item.link)
+                : navigate(item.link)
+            }
           >
             <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
               {item.icon}
@@ -285,9 +267,7 @@ export default function Sidebar() {
               </ListItemIcon>
               <ListItemText
                 primary={
-                  <Typography
-                    sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}
-                  >
+                  <Typography sx={{ fontSize: 14, color: darkMode ? "#fff" : "#000" }}>
                     {user.username}
                   </Typography>
                 }
@@ -296,23 +276,6 @@ export default function Sidebar() {
           ))}
         </List>
       )}
-
-      <Divider sx={{ my: 2, bgcolor: darkMode ? "#444" : "#e0e0e0" }} />
-
-      <List>
-        <ListItem button>
-          <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
-            <Chat />
-          </ListItemIcon>
-          <ListItemText primary="Chat" />
-        </ListItem>
-        <ListItem button>
-          <ListItemIcon sx={{ color: darkMode ? "#fff" : "#000" }}>
-            <Settings />
-          </ListItemIcon>
-          <ListItemText primary="Settings" />
-        </ListItem>
-      </List>
     </Box>
   );
 }

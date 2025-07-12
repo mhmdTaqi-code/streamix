@@ -1,7 +1,14 @@
+// File: redux/reducers/index.js
+
 import { combineReducers } from "redux";
-import AuthReduser from "./AuthReducer"
+import AuthReducer from "./AuthReducer";
 import CatgReducer from "./catgReducer";
 import themeReducer from "./themeReducer";
+import followingReducer from "./followingReducer"; // ✅ أضف هذا
 
-
-export default combineReducers({authReducer:AuthReduser ,    theme: themeReducer,catg:CatgReducer })
+export default combineReducers({
+  authReducer: AuthReducer,
+  theme: themeReducer,
+  catg: CatgReducer,
+  following: followingReducer, // ✅ أضف هذا هنا
+});

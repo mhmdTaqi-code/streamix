@@ -51,7 +51,7 @@ function App() {
           <Route path="/streamix" element={<Homepage />} />
           <Route path="/my-videos" element={<MyVideos />} />
           <Route path="/live" element={<LiveStreamLobby />} />
-          <Route path="/FollowPage" element={<FollowPage />} />
+          <Route path="/FollowingPage" element={<FollowPage />} />
           <Route path="/VideoPage" element={<VideoPage />} />
           <Route path="/TrendingPage" element={<TrendingPage />} />
           <Route path="/playlist" element={<Playlist />} />
@@ -59,7 +59,9 @@ function App() {
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/category/:id" element={<CategoryVideos />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/game" element={<GameCentr />} />  {/* استخدم المكون هنا */}
+          <Route path="/game" element={<GameCentr />} />
+          <Route path="/video/:id" element={<VideoPage />} />
+  {/* استخدم المكون هنا */}
         </Routes>
       </Router>
     </ThemeProvider>
