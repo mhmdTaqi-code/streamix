@@ -1,11 +1,11 @@
 // File: redux/action/CatgAction.js
 
 import { GetALLCatg, GetErr } from "../type";
-import Baseurl from "../../Api/BaceUrl";
+import axiosInstance from "../../Api/axiosInstance";
 
 const GETALLCAT = () => async (dispatch) => {
   try {
-    const res = await Baseurl.get("/live/api/categories/"); // ✅ التصحيح هنا
+    const res = await axiosInstance.get("/live/api/categories/"); // ✅ التصحيح هنا
     console.log("Categories API Response:", res.data);
 
     dispatch({

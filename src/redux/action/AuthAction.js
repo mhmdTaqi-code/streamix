@@ -1,9 +1,10 @@
 import axios from "axios";
 import { LOGIN_USER } from "../type";
+import axiosInstance from "../../Api/axiosInstance";
 
 export const loginUser = (userData) => async (dispatch) => {
   try {
-    const res = await axios.post("https://devhunter123.pythonanywhere.com/api/login/", userData);
+    const res = await axiosInstance.post("/api/login/", userData);
 
     dispatch({
       type: LOGIN_USER,

@@ -15,6 +15,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../Api/axiosInstance";
 
 export default function LiveChannels() {
   const [channels, setChannels] = useState([]);
@@ -28,8 +29,8 @@ export default function LiveChannels() {
   const darkMode = mode === "dark";
 
   useEffect(() => {
-    axios
-      .get("https://dev1hunter.pythonanywhere.com/live/api/streams/")
+   axiosInstance
+      .get("/live/api/streams/")
       .then((response) => {
         setChannels(response.data);
         setLoading(false);
