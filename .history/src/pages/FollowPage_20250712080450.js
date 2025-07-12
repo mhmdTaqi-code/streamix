@@ -37,17 +37,12 @@ export default function FollowPage() {
   const token = localStorage.getItem("accessToken");
   const isMyPage = !usernameParam || usernameParam === currentUsername;
 
-  // ✅ تحقق من تسجيل الدخول
   useEffect(() => {
     if (!token) {
       toast.error("Please log in first.");
       navigate("/login");
+      return;
     }
-  }, [token, navigate]);
-
-  // ✅ جلب قائمة المتابعة
-  useEffect(() => {
-    if (!token) return;
 
     if (isMyPage) {
       dispatch(getFollowing());
@@ -62,12 +57,12 @@ export default function FollowPage() {
         .then((res) => {
           setExternalList(res.data);
         })
-        .catch(() => {
+        .catch((err) => {
           toast.error("Failed to load the list.");
         })
         .finally(() => setLoading(false));
     }
-  }, [dispatch, usernameParam, isMyPage, token]);
+  }, [dispatch, usernameParam]);
 
   const handleUnfollow = async (username) => {
     if (!token) {

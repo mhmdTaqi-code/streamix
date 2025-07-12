@@ -7,6 +7,7 @@ import {
   CardMedia,
   CardContent,
   Chip,
+  Avatar,
   IconButton,
   MenuItem,
 } from "@mui/material";

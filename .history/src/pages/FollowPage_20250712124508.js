@@ -37,37 +37,34 @@ export default function FollowPage() {
   const token = localStorage.getItem("accessToken");
   const isMyPage = !usernameParam || usernameParam === currentUsername;
 
-  // ✅ تحقق من تسجيل الدخول
   useEffect(() => {
     if (!token) {
       toast.error("Please log in first.");
       navigate("/login");
+      return;
     }
-  }, [token, navigate]);
 
-  // ✅ جلب قائمة المتابعة
-  useEffect(() => {
-    if (!token) return;
+   useEffect(() => {
+  if (isMyPage) {
+    dispatch(getFollowing());
+    setLoading(false);
+  } else {
+    axiosInstance
+      .get(`/profile/${usernameParam}/following/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setExternalList(res.data);
+      })
+      .catch((err) => {
+        toast.error("Failed to load the list.");
+      })
+      .finally(() => setLoading(false));
+  }
+}, [dispatch, usernameParam, isMyPage, token]);
 
-    if (isMyPage) {
-      dispatch(getFollowing());
-      setLoading(false);
-    } else {
-      axiosInstance
-        .get(`/profile/${usernameParam}/following/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          setExternalList(res.data);
-        })
-        .catch(() => {
-          toast.error("Failed to load the list.");
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [dispatch, usernameParam, isMyPage, token]);
 
   const handleUnfollow = async (username) => {
     if (!token) {

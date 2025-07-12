@@ -16,13 +16,13 @@ import GETALLCAT from "../../redux/action/CatgAction";
 export default function Categories() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { catg: categories, } = useSelector((state) => state.catg);
+  const { catg: categories, isLoading } = useSelector((state) => state.catg);
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
 
   useEffect(() => {
     dispatch(GETALLCAT());
-  }, [dispatch]);
+  }, []);
 
   return (
     <Box sx={{ px: 2, mb: 4 }}>
