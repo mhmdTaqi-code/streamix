@@ -2,8 +2,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-baseURL: "https://thingproxy.freeboard.io/fetch/https://dev1hunter.pythonanywhere.com"
-,
+  baseURL: "https://cors-anywhere.herokuapp.com/https:/dev1hunter.pythonanywhere.com",
 });
 
 axiosInstance.interceptors.request.use(
