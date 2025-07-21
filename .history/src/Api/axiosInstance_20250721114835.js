@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-baseURL: "https://dev1hunter.pythonanywhere.com"
+baseURL: "https://api.allorigins.win/raw?url=https://dev1hunter.pythonanywhere.com"
 ,
 });
 
