@@ -1,50 +1,39 @@
-// File: src/pages/Register.jsx
+// File: src/pages/Login.jsx
 import React from "react";
+import FullScreenLoader from "../components/Loading";
 import {
   Box,
+  Paper,
+  Avatar,
   Typography,
   TextField,
   Button,
-  Paper,
   Link,
-  Avatar,
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import logo from "../assets/1.png";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import useRegisterHook from "../Hooks/Auth/register-hook";
-import FullScreenLoader from "../components/Loading";
+import useLoginHook from "../Hooks/Auth/login-hook";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/reducers/themeReducer";
 import { motion } from "framer-motion";
 
-export default function Register() {
+export default function Login() {
   const {
-    name,
     email,
     password,
     loading,
-    onChangeName,
     onChangeEmail,
     onChangePassword,
     onSubmit,
-  } = useRegisterHook();
+  } = useLoginHook();
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
-
-  const handleSubmit = async () => {
-    const success = await onSubmit();
-    if (success) {
-      navigate("/login", { state: { justRegistered: true } });
-    }
-  };
 
   return (
     <Box
@@ -55,14 +44,14 @@ export default function Register() {
         justifyContent: "center",
         position: "relative",
         overflow: "hidden",
-        bgcolor: darkMode ? "#0e0e0e" : "#f0f0f0",
+        bgcolor: darkMode ? "#0e0e0e" : "#f0f0f0", // خلفية ثابتة بدل VANTA
       }}
     >
       {loading && <FullScreenLoader />}
 
       <Paper
         component={motion.div}
-        initial={{ y: 40, opacity: 0 }}
+        initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
         elevation={6}
@@ -100,7 +89,7 @@ export default function Register() {
           mb={2}
           sx={{ color: darkMode ? "#f5f5f5" : "#000" }}
         >
-          Create your account
+          Welcome to Streamix
         </Typography>
 
         <Box
@@ -109,26 +98,6 @@ export default function Register() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <TextField
-            label="Full Name"
-            fullWidth
-            variant="outlined"
-            margin="normal"
-            value={name}
-            onChange={onChangeName}
-            sx={{
-              input: { color: darkMode ? "#fff" : "#000" },
-              label: { color: darkMode ? "#bbb" : "#000" },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: darkMode ? "#888" : "#ccc",
-                },
-                "&:hover fieldset": {
-                  borderColor: darkMode ? "#aaa" : "#000",
-                },
-              },
-            }}
-          />
           <TextField
             label="Email"
             type="email"
@@ -171,18 +140,15 @@ export default function Register() {
               },
             }}
           />
-
           <Button
             variant="contained"
             color="primary"
             fullWidth
             sx={{ mt: 2 }}
-            onClick={handleSubmit}
-            disabled={loading}
+            onClick={onSubmit}
           >
-            {loading ? "Loading..." : "Register"}
+            Login
           </Button>
-
           <Button
             variant="outlined"
             color="secondary"
@@ -193,21 +159,20 @@ export default function Register() {
               localStorage.removeItem("refreshToken");
               localStorage.removeItem("username");
               localStorage.setItem("isGuest", "true");
-              window.location.href = "/";
+              window.location.href = "/home";
             }}
           >
             دخول كـ ضيف
           </Button>
-
           <Typography
             variant="body2"
             align="center"
             mt={2}
             sx={{ color: darkMode ? "#ccc" : "#444" }}
           >
-            Already have an account?{" "}
-            <Link component={RouterLink} to="/login">
-              Login here
+            Don't have an account?{" "}
+            <Link component={RouterLink} to="/register">
+              Register here
             </Link>
           </Typography>
         </Box>

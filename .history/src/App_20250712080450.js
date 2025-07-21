@@ -44,10 +44,10 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-<Route path="/home" element={<Homepage toggleTheme={() => setMode(prev => (prev === "light" ? "dark" : "light"))} />} />
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/" element={<Homepage toggleTheme={() => setMode(prev => (prev === "light" ? "dark" : "light"))} />} />
+          <Route path="/home" element={<Homepage toggleTheme={() => setMode(prev => (prev === "light" ? "dark" : "light"))} />} />
           <Route path="/streamix" element={<Homepage />} />
           <Route path="/my-videos" element={<MyVideos />} />
           <Route path="/live" element={<LiveStreamLobby />} />

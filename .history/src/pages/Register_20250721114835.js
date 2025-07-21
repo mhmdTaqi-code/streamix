@@ -193,7 +193,7 @@ export default function Register() {
               localStorage.removeItem("refreshToken");
               localStorage.removeItem("username");
               localStorage.setItem("isGuest", "true");
-              window.location.href = "/";
+              window.location.href = "/home";
             }}
           >
             دخول كـ ضيف
