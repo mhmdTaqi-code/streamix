@@ -1,48 +1,48 @@
-//src/Api/axiosInstance.js
 import axios from "axios";
 
+const isProd =
+  typeof window !== "undefined" && window.location.hostname !== "localhost";
+
 const axiosInstance = axios.create({
-baseURL: "https://dev1hunter.pythonanywhere.com"
-,
+  baseURL: isProd
+    ? "/api/proxy" // على Vercel: سيضرب دالة البروكسي
+    : "http://localhost:8080/https://dev1hunter.pythonanywhere.com", // للتطوير مع cors-anywhere
 });
 
-axiosInstance.interceptors.request.use(
-  async (config) => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// Authorization
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
+// Refresh flow 401
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   async (error) => {
-    const originalRequest = error.config;
+    const original = error.config;
     if (
       error.response?.status === 401 &&
-      !originalRequest._retry &&
+      !original._retry &&
       localStorage.getItem("refreshToken")
     ) {
-      originalRequest._retry = true;
+      original._retry = true;
       try {
-        const res = await axios.post(
-          "https://api.allorigins.win/raw?url=https://dev1hunter.pythonanywhere.com/api/token/refresh/",
-          {
-            refresh: localStorage.getItem("refreshToken"),
-          }
-        );
-        const newAccess = res.data.access;
-        localStorage.setItem("accessToken", newAccess);
-        axiosInstance.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
-        originalRequest.headers.Authorization = `Bearer ${newAccess}`;
-        return axiosInstance(originalRequest); // أعد المحاولة
-      } catch (err) {
+        const refreshUrl = isProd
+          ? "/api/proxy/api/token/refresh/"
+          : "http://localhost:8080/https://dev1hunter.pythonanywhere.com/api/token/refresh/";
+
+        const { data } = await axios.post(refreshUrl, {
+          refresh: localStorage.getItem("refreshToken"),
+        });
+        localStorage.setItem("accessToken", data.access);
+        axiosInstance.defaults.headers.common.Authorization = `Bearer ${data.access}`;
+        original.headers.Authorization = `Bearer ${data.access}`;
+        return axiosInstance(original);
+      } catch {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        window.location.href = "/login"; // أعِد المستخدم لتسجيل الدخول
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);

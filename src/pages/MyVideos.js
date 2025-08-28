@@ -22,6 +22,8 @@ import { motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
 import { SIDEBAR_WIDTH } from "../redux/type";
 import axios from "axios";
+import axiosInstance from "../Api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export default function MyVideos() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -31,6 +33,7 @@ export default function MyVideos() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const mode = useSelector((state) => state.theme.mode);
   const darkMode = mode === "dark";
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -41,7 +44,6 @@ export default function MyVideos() {
       return;
     }
 
-    // Fetch user profile image
     const fetchProfile = async () => {
       try {
         const res = await axios.get(`/profile/${username}/`, {
@@ -51,13 +53,12 @@ export default function MyVideos() {
         });
         const imageUrl =
           res.data.profile_picture || res.data.user.profile_picture;
-        setUserImage(imageUrl); // could be null
+        setUserImage(imageUrl);
       } catch (err) {
         console.error("Failed to fetch profile image", err);
       }
     };
 
-    // Fetch user videos
     const fetchVideos = async () => {
       try {
         const response = await axios.get("/live/api/videos", {
@@ -207,6 +208,8 @@ export default function MyVideos() {
                     lg={3}
                     key={video.id}
                     sx={{ display: "flex", justifyContent: "center" }}
+                    onClick={() => navigate(`/video/${video.id}`)}
+                    style={{ cursor: "pointer" }}
                   >
                     <Tilt
                       glareEnable={true}
